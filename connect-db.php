@@ -13,11 +13,11 @@
 ////////////////////////////////////////////
 
 /** F25, PHP (on local XAMPP or CS server) connect to MySQL instance (GCP) **/
-// $username = 'root';
-// $password = 'your-root-password';
-// $host = 'instance-connection-name';       // e.g., 'cs4750:us-east4:db-demo'; 
-// $dbname = 'your-database-name;;           // e.g., 'guestbook';
-// $dsn = "mysql:host=your-SQL-public-IP-address;dbname=your-database-name";   // connect PHP (XAMPP) to DB (GCP)
+$username = 'cs4750-research-page';
+$password = 'researchDB_25';
+$host = 'cs4750-db-group:us-east4:cs4750-research-page';       // e.g., 'cs4750:us-east4:db-demo'; 
+$dbname = 'research_info';          // e.g., 'guestbook';
+$dsn = "mysql:host=35.245.184.229;dbname=$dbname";   // connect PHP (XAMPP) to DB (GCP)
 //     e.g., "mysql:host=99.99.999.99;dbname=$dbname";   
 
 // to get public IP addres of the SQL instance, go to GCP SQL overview page
@@ -30,15 +30,15 @@
 ////////////////////////////////////////////
 
 /** F25, PHP (on GCP, local XAMPP, or CS server) connect to MySQL (on local XAMPP) **/
-$host = 'localhost:3306';
-$dbname = 'maintenance_system';    // voting_system
-$dsn = "mysql:host=$host;dbname=$dbname";  
+//$host = 'localhost:3306';
+//$dbname = 'maintenance_system';    // voting_system
+//$dsn = "mysql:host=$host;dbname=$dbname";  
 
 
 /** connect to the database **/
 try 
 {
-   $db = new PDO("mysql:host=$host;dbname=maintenance_system", $username, $password);
+   //$db = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
    $db = new PDO($dsn, $username, $password);
    
    // dispaly a message to let us know that we are connected to the database 
