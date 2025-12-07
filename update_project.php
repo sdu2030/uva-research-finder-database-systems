@@ -5,12 +5,13 @@ require('connect-db.php');
 require('project-db.php');
 // The UID of the current user should persist
 $UID = null;
+// The PID of the project to update should come from professor
 ?>
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!empty($_POST['addBtn'])) {
-        createProject($_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc'], $UID);
+    if (!empty($_POST['updateBtn'])) {
+        updateProject($_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc'], $UID);
         if (isset($_POST['keywords'])) {
             $selectedKeywords = $_POST['keywords'];
             foreach ($selectedKeywords as $keyword) {
@@ -34,9 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Tommy Le">
-    <meta name="description" content="The create project page for HooResearches, a CS 3750 (Database Systems) project.">
+    <meta name="description" content="The update project page for HooResearches, a CS 3750 (Database Systems) project.">
     <meta name="keywords" content="CS 3750, UVa research, create project, Database Systems">
-    <title>HooResearches Create Project</title>
+    <title>HooResearches Update Project</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
@@ -89,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
         <div class="row justify-content-center">
-            <button type="submit" class="btn btn-primary col-sm-10" id="addBtn" name="addBtn">Submit</button>
+            <button type="submit" class="btn btn-primary col-sm-10" id="updateBtn" name="updateBtn">Update</button>
         </div>
         <input type="hidden" id="PID" name="PID" value="<?php echo $_POST['PID']; ?>">
     </form>
