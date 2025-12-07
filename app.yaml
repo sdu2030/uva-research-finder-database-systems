@@ -1,0 +1,11 @@
+runtime: php83
+entrypoint: serve index.php  # or student.php if you're testing just that
+
+env_variables:
+  DB_USER: "cs4750-research-page"
+  DB_PASS: "researchDB_25"
+  DB_NAME: "research_info"
+  CLOUD_SQL_CONNECTION_NAME: "cs4750-db-group:us-east4:cs4750-research-page"
+
+beta_settings:
+  cloud_sql_instances: "cs4750-db-group:us-east4:cs4750-research-page"
