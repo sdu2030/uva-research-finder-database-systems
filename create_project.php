@@ -1,4 +1,8 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require('connect-db.php');
+require('project-db.php');
 ?>
 
 <!doctype html>

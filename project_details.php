@@ -3,6 +3,7 @@ require('connect-db.php');
 require('project-db.php');
 session_start();
 $_SESSION['pid'] = 104;
+#$list_of_projects = getAllProjects()
 ?>
 
 <!doctype html>
