@@ -21,6 +21,11 @@ switch ($uri) {
         require __DIR__ . '/professor.php';
         break;
 
+    case '/create-proj.php':
+    case '/create-proj':
+        require __DIR__ . '/create-proj.php';
+        break; 
+
     // Default: show login/landing page
     default:
         // If you have a real login.php in this branch:
