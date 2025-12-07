@@ -1,10 +1,10 @@
 <?php
 // index.php - front controller / router for App Engine.
 
-// Figure out what path was requested, e.g. "/student.php", "/professor.php"
+/
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 
-// Normalize (optional): remove trailing slashes
+
 $uri = rtrim($uri, '/');
 if ($uri === '') {
     $uri = '/';
@@ -23,11 +23,11 @@ switch ($uri) {
 
     // Default: show login/landing page
     default:
-        // If you have a real login.php in this branch:
+      
         if (file_exists(__DIR__ . '/login.php')) {
             require __DIR__ . '/login.php';
         } else {
-            // Simple placeholder so the app works even without login.php
+           
             ?>
             <!doctype html>
             <html>

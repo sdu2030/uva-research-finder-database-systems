@@ -1,0 +1,12 @@
+**
+!app.yaml
+!index.php
+!login.php
+!student.php
+!professor.php
+!create-project.php
+!project-db.php
+!project_details.php
+!connect-db.php
+!assets/
+!assets/**
