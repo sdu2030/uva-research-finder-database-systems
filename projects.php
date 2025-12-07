@@ -136,7 +136,7 @@ else{
     <!--
     <td>
         <form action="request.php" method="post">
-            <input type="hidden" name="reqId" value="<?php echo $proj_info['reqId']; ?>" />
+            <input type="hidden" name="reqId" value="<?php #echo $proj_info['reqId']; ?>" />
             <input type="submit" value="Update" name="updateBtn" class="btn btn-danger" title="Click to update request" />
         </form>
     </td>
@@ -148,7 +148,7 @@ else{
                 title="Click to delete this request"
         />
         <input type="hidden" name="reqId"
-                value="<?php echo $proj_info['reqId']; ?>" /> 
+                value="<?#php echo $proj_info['reqId']; ?>" /> 
 
   -->
 

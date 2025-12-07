@@ -167,4 +167,32 @@ function getTitle($pid)
     $string = implode("",$title);
     return $string;
 }
+
+function getNumStudents($pid)
+{
+    global $db;
+    $statement = $db->prepare("SELECT num_students FROM Project WHERE PID=:pid;");
+    $statement->bindValue(':pid',$pid);
+    $statement->execute();
+    $numstud = $statement->fetchAll(PDO::FETCH_COLUMN,0);
+    $statement->closeCursor();
+
+    $string = implode("",$numstud);
+    return $string;
+}
+
+function getDesc($pid)
+{
+    global $db;
+    $statement = $db->prepare("SELECT description FROM Project WHERE PID=:pid;");
+    $statement->bindValue(':pid',$pid);
+    $statement->execute();
+    $desc = $statement->fetchAll(PDO::FETCH_COLUMN,0);
+    $statement->closeCursor();
+
+    $string = implode("",$desc);
+    return $string;
+}
+
+
 ?>
