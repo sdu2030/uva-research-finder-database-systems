@@ -236,4 +236,42 @@ function deleteProject($PID)
     $statement->execute();
     $statement->closeCursor();
 }
+
+function addProjectKeyword($PID, $keyword)
+{
+    global $db;
+    $query = "INSERT INTO Project_keywords (keyword) VALUES (:keyword) WHERE PID=:PID";
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':keyword', $keyword);
+        $statement->bindValue(':PID', $PID);
+        $statement->execute();
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    catch (Exception $e) {
+        echo $e->getMessage();
+    }
+}
+
+function addProjectQual($PID, $qualification)
+{
+    global $db;
+    $query = "INSERT INTO Project_qualifications (qualification) VALUES (:qualification) WHERE PID=:PID";
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':qualification', $qualification);
+        $statement->bindValue(':PID', $PID);
+        $statement->execute();
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    catch (Exception $e) {
+        echo $e->getMessage();
+    }
+}
 ?>
