@@ -139,13 +139,14 @@ function getDescription($pid)
 {
     global $db;
 
-    $statement = $db->prepare("SELECT Description FROM Project WHERE PID=:pid;");
+    $statement = $db->prepare("SELECT description FROM Project WHERE PID=:pid;");
     $statement->bindValue(':pid',$pid);
     $statement->execute();
-    $desc = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $desc = $statement->fetchAll(PDO::FETCH_COLUMN,0);
     $statement->closeCursor();
 
-    return $desc;
+    $string = implode("",$desc);
+    return $string;
 }
 
 function getTitle($pid)
@@ -159,6 +160,57 @@ function getTitle($pid)
     $statement->closeCursor();
 
     $string = implode("",$title);
+    return $string;
+}
+
+function getPaid_Credit($pid)
+{
+    global $db;
+
+    $statement = $db->prepare("SELECT paid_credit FROM Project WHERE PID=:pid;");
+    $statement->bindValue(':pid',$pid);
+    $statement->execute();
+    $pcr = $statement->fetchAll(PDO::FETCH_COLUMN,0);
+    $statement->closeCursor();
+
+    $string = implode("",$pcr);
+    return $string;
+}
+
+function getResearcher($pid)
+{
+    global $db;
+
+    $statement = $db->prepare("SELECT UID FROM Project WHERE PID=:pid;");
+    $statement->bindValue(':pid',$pid);
+    $statement->execute();
+    $uid = $statement->fetchAll(PDO::FETCH_COLUMN,0);
+    $statement->closeCursor();
+
+    $input = implode("",$uid);
+
+    $statement = $db->prepare("SELECT name FROM Person WHERE UID=:input;");
+    $statement->bindValue(':input',$input);
+    $statement->execute();
+    $researcher = $statement->fetchAll(PDO::FETCH_COLUMN,0);
+    $statement->closeCursor();
+
+    $result = implode("",$researcher);
+
+    return $result;
+}
+
+function getNumStudents($pid)
+{
+    global $db;
+
+    $statement = $db->prepare("SELECT num_students FROM Project WHERE PID=:pid;");
+    $statement->bindValue(':pid',$pid);
+    $statement->execute();
+    $numstuds = $statement->fetchAll(PDO::FETCH_COLUMN,0);
+    $statement->closeCursor();
+
+    $string = implode("",$numstuds);
     return $string;
 }
 

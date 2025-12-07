@@ -28,15 +28,29 @@ $_SESSION['uid'] = 'akp5ve';
     <h3 class="text-center"><?php echo getTitle($_SESSION['pid'])?></h3>
     <div class="row mb-3 justify-content-center">
         
+    <div class="row mb-3 justify-content-center">
+        <div class="col-sm-10">
+            <label for="researcher" class="form-label fw-bold">Researcher</label>
+            <div>
+                <?php echo getResearcher($_SESSION['pid']);?>
+            </div>
+        </div>
+    </div>
 
     <div class="row mb-3 justify-content-center">
         <div class="form-check col-sm-3">
-            
-            <input class="form-check-input" type="checkbox" id="paid" 
+            <input class="form-check-input" type="checkbox" id="interest" 
                 <?php if (getInterestedValue($_SESSION['uid'],$_SESSION['pid']) )echo 'checked'; ?>>
-            <label class="form-check-label fw-bold" for="paid">Paid?</label>
+            <label class="form-check-label fw-bold" for="paid">Interested?</label>
         </div>
-        <div class="col-sm-7">
+
+        <div class="col-sm-3">
+            <label for="pcr" class="form-label fw-bold">Paid or Credit?</label>
+            <div >
+                <?php echo getPaid_Credit($_SESSION['pid']);?>
+        </div>
+        </div>
+        <div class="col-sm-3">
             <label for="numStudents" class="form-label fw-bold">Number of Students</label>
             <div >
                 <?php echo getNumStudents($_SESSION['pid']);?>
@@ -48,7 +62,7 @@ $_SESSION['uid'] = 'akp5ve';
         <div class="col-sm-10">
             <label for="projectDesc" class="form-label fw-bold">Description</label>
             <div>
-                <?php echo getDesc($_SESSION['pid']);?>
+                <?php echo getDescription($_SESSION['pid']);?>
             </div>
         </div>
     </div>
