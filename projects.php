@@ -1,0 +1,174 @@
+<?php
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require('connect-db.php');
+require('project-db.php');
+#$list_of_projects = getAllProjects();
+$_SESSION['uid'] = 'akp5ve';
+
+if (isset($_GET['pid'])) {
+    $_SESSION['selected_project'] = $_GET['pid'];
+    header("Location: project_details.php");
+    exit();
+}
+
+if (isset($_POST['applyBtn'])) {
+    $keyword = $_POST['keyword'] ?? "";
+    $researcher = $_POST['researcher'] ?? "";
+    $pcr = $_POST['p_cr'] ?? "none";
+    $_SESSION['pcr'] = $pcr;
+    echo $_POST['keyword'];
+    echo $_SESSION['pcr'];
+
+    $list_of_projects = applyFilters($keyword, $researcher, $pcr);
+} //else if (!empty($_POST['projRedir'])){
+   // $pid = $_POST['projRedir'];
+//}
+else{
+    $list_of_projects = getAllProjects();
+}
+
+?>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Holly Kiker">
+    <meta name="description" content="The project details page for HooResearches, a CS 3750 (Database Systems) project.">
+    <meta name="keywords" content="CS 3750, UVa research, project details, Database Systems">
+    <title>HooResearches Project Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body>
+<div class="text-left text-bg-dark m-3 p-3">
+    <h1>HooResearches</h1>
+    <p>A UVa CS research finder</p>
+</div>
+
+<hr/>
+<div class="container">
+<h3>All Projects</h3>
+<h5>Search</h5>
+<div style="display: flex; gap: 20px; align-items: center;">
+    <div>
+        <label for="search">Search:</label>
+        <input type="text" id="search" name="search">
+  </div>
+  <div>
+    <input type="submit" value="Search" id="searchBtn" name="searchBtn" class="btn btn-light"
+           title="Search for project by Title" />  
+</div>
+
+</div>
+<h5>Filter</h5>
+<form method="POST" action="projects.php">
+<div style="display: flex; gap: 20px; align-items: center;">
+  <div>
+    <label for="keyword">Keyword:</label>
+    <select name="keyword" id="keyword">
+      <option value="none"> -none- </option>
+      <option value="machine learning">machine learning</option>
+      <option value="os">OS</option>
+    </select>
+  </div>
+  <div>
+    <label for="researcher">Researcher:</label>
+    <input type="text" id="researcher" name="researcher">
+  </div>
+  <div>
+    <label for="p_cr">Paid or Credit:</label>
+    <select name="p_cr" id="p_cr">
+      <option value="selected" ><?php $_SESSION['pcr'];?></option>
+      <option value="none">-none-</option>
+      <option value="paid">Paid</option>
+      <option value="credit">Credit</option>
+    </select>
+  </div>
+  <div>
+    <input type="submit" value="Apply" id="applyBtn" name="applyBtn" class="btn btn-light"
+           title="Apply filter options" />  
+</div>
+
+
+</div>
+</form>
+
+
+<div class="row justify-content-center">  
+<table class="w3-table w3-bordered w3-card-4 center" style="width:100%">
+  <thead> <!--header columns of table ; tr for row, td for column -->
+  <tr style="background-color:#B0B0B0">
+    <th width="30%"><b>Interested</b></th>
+    <th width="30%"><b>Title</b></th>
+    <th width="30%"><b>Researcher</b></th>        
+    <th width="30%"><b>Paid or Credit</b></th> 
+    <th width="30%"><b>Students</b></th>
+    <th width="30%"><b>Keywords</b></th>        
+    <th width="30%"><b>Qualifications</b></th> 
+  </tr>
+  </thead>
+
+  <?php foreach ($list_of_projects as $proj_info): ?>
+
+
+<!--    create some logic to pull these associated values -->
+  <tr>
+    <td>
+      <input type = "checkbox" 
+        disabled
+        <?php if (getInterestedValue($_SESSION['uid'],$proj_info['PID']) )echo 'checked'; ?>> </td>
+    <td>
+      <a href="projects.php?pid=<?php echo $proj_info['PID']; ?>" class="button">
+        <?php echo $proj_info['title']; ?>
+    </a>
+       </td> 
+    <td><?php echo $proj_info['UID']; ?> </td> 
+    <td><?php echo $proj_info['paid_credit']; ?> </td>
+    <td><?php echo (string) $proj_info['num_students']; ?> </td>  
+    <td><?php echo getKeywords($proj_info['PID']); ?> </td> 
+    <td><?php echo getQualifications($proj_info['PID']); ?> </td> 
+    
+    <!--
+    <td>
+        <form action="request.php" method="post">
+            <input type="hidden" name="reqId" value="<?php echo $proj_info['reqId']; ?>" />
+            <input type="submit" value="Update" name="updateBtn" class="btn btn-danger" title="Click to update request" />
+        </form>
+    </td>
+
+    <td>
+      <form action="request.php" method="post" >
+        <input type="submit" value="Delete"
+                name="deleteBtn" class="btn btn-danger"
+                title="Click to delete this request"
+        />
+        <input type="hidden" name="reqId"
+                value="<?php echo $proj_info['reqId']; ?>" /> 
+
+  -->
+
+  </form>
+ 
+
+
+    </td>
+
+
+  </tr>
+  <?php endforeach;?>
+  
+</table>
+
+</div>  
+
+
+
+<br/><br/>
+
+</body>
+</html>
