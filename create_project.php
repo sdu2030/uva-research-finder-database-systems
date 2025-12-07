@@ -1,4 +1,30 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require('connect-db.php');
+require('project-db.php');
+// The UID of the current user should persist
+$UID = null;
+?>
+
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!empty($_POST['addBtn'])) {
+        createProject($_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc'], $UID);
+        if (isset($_POST['keywords'])) {
+            $selectedKeywords = $_POST['keywords'];
+            foreach ($selectedKeywords as $keyword) {
+                addProjectKeyword($_POST['PID'], $keyword);
+            }
+        }
+        if (isset($_POST['project_quals'])) {
+            $selectedQuals = $_POST['project_quals'];
+            foreach ($selectedQuals as $project_qual) {
+                addProjectQual($_POST['PID'], $project_qual);
+            }
+        }
+    }
+}
 ?>
 
 <!doctype html>
@@ -13,52 +39,65 @@
     <title>HooResearches Create Project</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
-
 <body>
-<div class="text-left text-bg-dark m-3 p-3">
-    <h1>HooResearches</h1>
-    <p>A UVa CS research finder</p>
-</div>
-<form>
-    <h3 class="text-center">Create Project</h3>
-    <div class="row mb-3 justify-content-center">
-        <div class="col-sm-10">
-            <label for="projectTitle" class="form-label fw-bold">Title*</label>
-            <input type="text" class="form-control" id="projectTitle">
-        </div>
+    <div class="text-left text-bg-dark m-3 p-3">
+        <h1>HooResearches</h1>
+        <p>A UVa CS research finder</p>
     </div>
-
-    <div class="row mb-3 justify-content-center">
-        <div class="form-check col-sm-3">
-            <input class="form-check-input" type="checkbox" id="paid">
-            <label class="form-check-label fw-bold" for="paid">Paid?</label>
+    <form method="post" action="<?php $_SERVER['PHP_SELF'] ?>" onsubmit="return validateInput()">
+        <h3 class="text-center">Create Project</h3>
+        <div class="row mb-3 justify-content-center">
+            <div class="col-sm-10">
+                <label for="title" class="form-label fw-bold">Title*</label>
+                <input type="text" class="form-control" id="title" name="title">
+            </div>
         </div>
-        <div class="col-sm-7">
-            <label for="numStudents" class="form-label fw-bold">Number of Students*</label>
-            <input type="text" class="form-control" id="numStudents">
+        <div class="row mb-3 justify-content-center">
+            <div class="form-check col-sm-3">
+                <label for="paid_credit">Paid or Credit*</label>
+                <select name="paid_credit" id="paid_credit">
+                    <option value="paid">Paid</option>
+                    <option value="credit">Credit</option>
+                </select>
+            </div>
+            <div class="col-sm-7">
+                <label for="num_students" class="form-label fw-bold">Number of Students*</label>
+                <input type="text" class="form-control" id="num_students" name="num_students">
+            </div>
         </div>
-    </div>
-
-    <div class="row mb-3 justify-content-center">
-        <div class="col-sm-10">
-            <label for="projectDesc" class="form-label fw-bold">Description*</label>
-            <textarea class="form-control" id="projectDesc"></textarea>
+        <div class="row mb-3 justify-content-center">
+            <div class="col-sm-10">
+                <label for="project_desc" class="form-label fw-bold">Description*</label>
+                <textarea class="form-control" id="project_desc" name="project_desc"></textarea>
+            </div>
         </div>
-    </div>
-
-    <div class="row mb-3 justify-content-center">
-        <div class="col-sm-10">
-            <label for="keywords" class="form-label fw-bold">Keywords</label>
-            <input type="text" class="form-control" id="keywords">
+        <div class="row mb-3 justify-content-center">
+            <div class="col-sm-10">
+                <label for="keywords">Keywords</label>
+                <select name="keywords[]" id="keywords" multiple="multiple">
+                    <option value="none">None</option>
+                    <option value="machine learning">Machine Learning</option>
+                    <option value="os">OS</option>
+                </select>
+            </div>
         </div>
+        <div class="row mb-3 justify-content-center">
+            <div class="col-sm-10">
+                <label for="project_quals">Qualifications</label>
+                <select name="project_quals[]" id="project_quals" multiple="multiple">
+                    <option value="none">None</option>
+                    <option value="python">Python</option>
+                </select>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <button type="submit" class="btn btn-primary col-sm-10">Submit</button>
+        </div>
+        <input type="hidden" id="PID" name="PID" value="<?php echo $_POST['PID']; ?>">
+    </form>
+    <div class="text-left text-bg-dark m-3 p-3">
+        <p>Note: * indicates a required field.</p>
     </div>
-    <div class="row justify-content-center">
-        <button type="submit" class="btn btn-primary col-sm-10">Submit</button>
-    </div>
-</form>
-<div class="text-left text-bg-dark m-3 p-3">
-    <p>Note: * indicates a required field.</p>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

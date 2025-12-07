@@ -5,18 +5,12 @@ require_once("connect-db.php");
 function getAllProjects()
 {
     global $db;
-
     $query = "SELECT * FROM Project ORDER BY title DESC";
-
-
     $statement = $db->prepare($query);
-
     $statement->execute();
-
     $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
     $statement->closeCursor();
     return $projs;
-
 }
 
 function getInterestedValue($uid, $pid)
@@ -35,7 +29,7 @@ function getInterestedValue($uid, $pid)
     }
 
     return true;
-    
+
 
 }
 
@@ -52,7 +46,7 @@ function getKeywords($pid)
     $keywords = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
     $statement->closeCursor();
 
-    
+
     $string = implode(", ",$keywords);
 
     return $string;
@@ -75,7 +69,7 @@ function getQualifications($pid)
     $string = implode(", ",$qualifications);
 
     return $string;
-    
+
 }
 
 function applyFilters($keyword, $researcher, $pcr)
@@ -89,7 +83,7 @@ function applyFilters($keyword, $researcher, $pcr)
     }
     //if ($keyword == "-none-" && $researcher == "" &&$pcr!= "none"){
     if ($keyword == "none" && $researcher == "" && $pcr!= "none"){
-        
+
         $statement = $db->prepare("SELECT * FROM Project WHERE paid_credit=:pcr ORDER BY title DESC");
         $statement->bindValue(':pcr', $pcr);
         $statement->execute();
@@ -168,31 +162,116 @@ function getTitle($pid)
     return $string;
 }
 
-function getNumStudents($pid)
+function getProjectById($PID)
 {
     global $db;
-    $statement = $db->prepare("SELECT num_students FROM Project WHERE PID=:pid;");
-    $statement->bindValue(':pid',$pid);
-    $statement->execute();
-    $numstud = $statement->fetchAll(PDO::FETCH_COLUMN,0);
-    $statement->closeCursor();
-
-    $string = implode("",$numstud);
-    return $string;
+    $query = "SELECT * FROM Project WHERE PID = :PID";
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':PID', $PID);
+        $statement->execute();
+        $result = $statement->fetch();
+        $statement->closeCursor();
+        return $result;
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    catch (Exception $e) {
+        echo $e->getMessage();
+    }
 }
 
-function getDesc($pid)
+function createProject($title, $paid_credit, $num_students, $description, $UID)
 {
     global $db;
-    $statement = $db->prepare("SELECT description FROM Project WHERE PID=:pid;");
-    $statement->bindValue(':pid',$pid);
-    $statement->execute();
-    $desc = $statement->fetchAll(PDO::FETCH_COLUMN,0);
-    $statement->closeCursor();
-
-    $string = implode("",$desc);
-    return $string;
+    $query = "INSERT INTO Project (title, paid_credit, num_students, description, UID) VALUES (:title, :paid_credit, :num_students, :description, :UID)";
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':title', $title);
+        $statement->bindValue(':paid_credit', $paid_credit);
+        $statement->bindValue(':num_students', $num_students);
+        $statement->bindValue(':description', $description);
+        $statement->bindValue(':UID', $UID);
+        $statement->execute();
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    catch (Exception $e) {
+        echo $e->getMessage();
+    }
 }
 
+// Doesn't take in UID, because there's no reason to update the researcher associated
+function updateProject($PID, $title, $paid_credit, $num_students, $description)
+{
+    global $db;
+    $query = "UPDATE Project SET title = :title, paid_credit = :paid_credit, num_students = :num_students, description=:description WHERE PID=:PID";
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':title', $title);
+        $statement->bindValue(':paid_credit', $paid_credit);
+        $statement->bindValue(':num_students', $num_students);
+        $statement->bindValue(':description', $description);
+        $statement->bindValue(':PID', $PID);
+        $statement->execute();
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    catch (Exception $e) {
+        echo $e->getMessage();
+    }
+}
 
+function deleteProject($PID)
+{
+    global $db;
+    $query = "DELETE FROM Project WHERE PID=:PID";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':PID', $PID);
+    $statement->execute();
+    $statement->closeCursor();
+}
+
+function addProjectKeyword($PID, $keyword)
+{
+    global $db;
+    $query = "INSERT INTO Project_keywords (keyword) VALUES (:keyword) WHERE PID=:PID";
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':keyword', $keyword);
+        $statement->bindValue(':PID', $PID);
+        $statement->execute();
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    catch (Exception $e) {
+        echo $e->getMessage();
+    }
+}
+
+function addProjectQual($PID, $qualification)
+{
+    global $db;
+    $query = "INSERT INTO Project_qualifications (qualification) VALUES (:qualification) WHERE PID=:PID";
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':qualification', $qualification);
+        $statement->bindValue(':PID', $PID);
+        $statement->execute();
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    catch (Exception $e) {
+        echo $e->getMessage();
+    }
+}
 ?>
