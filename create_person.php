@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="row mb-3 justify-content-center">
             <div class="col-sm-10">
                 <label for="password" class="form-label fw-bold">Password</label>
-                <input type="text" class="form-control" id="password">
+                <input type="password" class="form-control" id="password">
             </div>
         </div>
         <div class="row mb-3 justify-content-center">
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <div class="row justify-content-center">
             <button type="submit" class="btn btn-primary col-sm-10" id="stuBtn" style="display: block;">Submit</button>
-            <button type="submit" class="btn btn-primary col-sm-10" id="profBtn">Submit</button>
+            <button type="submit" class="btn btn-primary col-sm-10" id="profBtn" style="display: none;">Submit</button>
         </div>
     </form>
     <?php require("footer.php"); ?>
