@@ -41,10 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-    <div class="text-left text-bg-dark m-3 p-3">
-        <h1>HooResearches</h1>
-        <p>A UVa CS research finder</p>
-    </div>
+    <?php require("header.php"); ?>
     <form method="post" action="<?php $_SERVER['PHP_SELF'] ?>" onsubmit="return validateInput()">
         <h3 class="text-center">Create Project</h3>
         <div class="row mb-3 justify-content-center">
@@ -94,9 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <input type="hidden" id="PID" name="PID" value="<?php echo $_POST['PID']; ?>">
     </form>
-    <div class="text-left text-bg-dark m-3 p-3">
-        <p>Note: * indicates a required field.</p>
-    </div>
+    <?php require("footer.php"); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -56,10 +56,7 @@ else{
 </head>
 
 <body>
-<div class="text-left text-bg-dark m-3 p-3">
-    <h1>HooResearches</h1>
-    <p>A UVa CS research finder</p>
-</div>
+<?php require ("header.php"); ?>
 
 <hr/>
 <div class="container">
@@ -183,6 +180,6 @@ else{
 
 
 <br/><br/>
-
+<?php require("footer.php"); ?>
 </body>
 </html>
