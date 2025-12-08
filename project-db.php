@@ -521,6 +521,7 @@ function addProjectQual($PID, $qualification)
 
 function markInterested($uid, $pid)
 {
+    echo "marking interest";
    global $db;
    $query = "INSERT INTO Marks_interest (UID, PID) VALUES (:uid, :pid)";
    try {
@@ -542,7 +543,7 @@ function markInterested($uid, $pid)
 function unmarkInterested($uid, $pid)
 {
     global $db;
-    $query = "DELETE FROM Marks_interest WHERE PID=:uid AND UID=:uid";
+    $query = "DELETE FROM Marks_interest WHERE PID=:pid AND UID=:uid";
     $statement = $db->prepare($query);
     $statement->bindValue(':uid', $uid);
     $statement->bindValue(':pid', $pid);

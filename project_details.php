@@ -12,16 +12,20 @@ if (isset($_GET['pid'])) {
 
 $_SESSION['uid'] = $_SESSION['currentUser']['UID'];
 
-if (isset($_POST['interested'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['interested'])) {
     $pid = $_SESSION['pid'];
     $uid = $_SESSION['uid'];
 
-    if ($_POST['interested']) {
-        markInterested($uid, $pid);   // your function to mark interest
+    if ($_POST['interested'] == "1") {
+        markInterested($uid, $pid);
     } else {
-        unmarkInterested($uid, $pid); // function to remove interest
+        unmarkInterested($uid, $pid);
     }
+
+    header("Location: project_details.php?pid=$pid");
+    exit();
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['updateBtn'])) {
@@ -33,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+$interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
 ?>
 
 <!doctype html>
@@ -67,13 +72,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     
 
-    <div class="row mb-3 justify-content-center">
+    
+            
+</form>
+<div class="row mb-3 justify-content-center">
         <div class="form-check col-sm-3">
-            <form method="POST" action="project_details.php">
-                <label class="form-label fw-bold"> Interested </label>
-        <input type="checkbox" name="interested" onchange="this.form.submit()"
-        <?php if (getInterestedValue($_SESSION['uid'],$_SESSION['pid'])) echo 'checked'; ?>>
-      </form>
+<form method="POST" action="project_details.php">
+    <!-- This field is sent if checkbox is unchecked -->
+    <input type="hidden" name="interested" value="0">
+    
+    <input type="checkbox" name="interested" value="1"
+    <?php if ($interested) echo "checked"; ?>
+    onchange="this.form.submit()">
+    Interested
+</form>
         </div>
 
         <div class="col-sm-3">
@@ -127,14 +139,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </div>
 </form>
-<div class="row mt-3 justify-content-center">
+<?php if ($_SESSION['currentUser']['UID'] == getProjectById($_SESSION['pid'])['UID']) {
+
+    echo '<div class="row mt-3 justify-content-center">
+
     <form method="post" id="update" name="update">
+
         <button type="submit" class="btn btn-primary col-sm-10" id="updateBtn" name="updateBtn">Update</button>
+
     </form>
+
     <form method="post" id="delete" name="delete">
+
         <button type="submit" class="btn btn-primary col-sm-10" id="deleteBtn" name="deleteBtn">Delete</button>
+
     </form>
-</div>
+
+</div>';
+
+}
+
+?>
 
 <?php require("footer.php"); ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

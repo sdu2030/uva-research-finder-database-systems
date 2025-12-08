@@ -12,15 +12,18 @@ if (isset($_GET['pid'])) {
     exit();
 }
 
-if (isset($_POST['interested']) && isset($_POST['pid'])) {
-    $pid = $_POST['pid'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['interested'])) {
+    $pid = $_SESSION['pid'];
     $uid = $_SESSION['uid'];
 
-    if ($_POST['interested']) {
-        markInterested($uid, $pid);   // your function to mark interest
+    if ($_POST['interested'] == "1") {
+        markInterested($uid, $pid);
     } else {
-        unmarkInterested($uid, $pid); // function to remove interest
+        unmarkInterested($uid, $pid);
     }
+
+    header("Location: project_details.php?pid=$pid");
+    exit();
 }
 
 if (isset($_POST['applyBtn'])) {
@@ -39,7 +42,7 @@ else if (isset($_POST['searchBtn'])) {
 else{
     $list_of_projects = getAllProjects();
 }
-
+$interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
 ?>
 
 <!doctype html>
@@ -147,11 +150,19 @@ else{
 <!--    create some logic to pull these associated values -->
   <tr>
     <td>
-      <form method="POST" action="projects.php">
-        <input type="hidden" name="pid" value="<?php echo $proj_info['PID']; ?>">
-        <input type="checkbox" name="interested" onchange="this.form.submit()"
-        <?php if (getInterestedValue($_SESSION['uid'],$proj_info['PID'])) echo 'checked'; ?>>
-      </form>
+      <form method="POST" action="project_details.php">
+    <!-- This field is sent if checkbox is unchecked -->
+    <input type="hidden" name="interested" value="0">
+    <input type="hidden" name="pid" value="<?php echo $proj_info['PID']; ?>">
+    <input type="checkbox" name="interested" value="1"
+    <?php if ($interested) echo "checked"; ?>
+    onchange="this.form.submit()">
+    Interested
+</form>
+        
+        
+        
+      
 </td>
 <td>
 
