@@ -1,52 +1,73 @@
 <?php
 // index.php - front controller / router for App Engine.
 
-// Figure out what path was requested, e.g. "/student.php", "/professor.php"
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 
-// Normalize (optional): remove trailing slashes
+// Normalize: remove trailing slash except for root
 $uri = rtrim($uri, '/');
 if ($uri === '') {
     $uri = '/';
 }
 
 switch ($uri) {
-    case '/student.php':
+    // --- Login / landing ---
+    case '/':
+    case '/login':
+    case '/login.php':
+        require __DIR__ . '/login.php';
+        break;
+
+    // --- Student portal ---
     case '/student':
+    case '/student.php':
         require __DIR__ . '/student.php';
         break;
 
-    case '/professor.php':
+    // --- Professor portal ---
     case '/professor':
+    case '/professor.php':
         require __DIR__ . '/professor.php';
         break;
 
-    case '/create-proj.php':
-    case '/create-proj':
-        require __DIR__ . '/create-proj.php';
-        break; 
+    // --- All projects list ---
+    case '/projects':
+    case '/projects.php':
+        require __DIR__ . '/projects.php';
+        break;
 
-    // Default: show login/landing page
+    // --- Create project page ---
+    case '/create-proj':
+    case '/create-proj.php':
+        require __DIR__ . '/create-proj.php';
+        break;
+
+    // --- Project details ---
+    case '/project_details':
+    case '/project_details.php':
+        require __DIR__ . '/project_details.php';
+        break;
+
+    // --- Professor details ---
+    case '/prof_details':
+    case '/prof_details.php':
+        require __DIR__ . '/prof_details.php';
+        break;
+
+    // --- Fallback: if a .php file exists, serve it directly ---
     default:
-        // If you have a real login.php in this branch:
-        if (file_exists(__DIR__ . '/login.php')) {
-            require __DIR__ . '/login.php';
+        $path = __DIR__ . $uri;
+        if (str_ends_with($uri, '.php') && file_exists($path)) {
+            require $path;
         } else {
-            // Simple placeholder so the app works even without login.php
+            http_response_code(404);
             ?>
             <!doctype html>
             <html>
-            <head>
-                <meta charset="utf-8">
-                <title>HooResearches</title>
-            </head>
+            <head><meta charset="utf-8"><title>404 Not Found</title></head>
             <body>
-                <h1>HooResearches</h1>
-                <p>Select a portal:</p>
-                <ul>
-                    <li><a href="/student.php">Student Portal</a></li>
-                    <li><a href="/professor.php">Professor Portal</a></li>
-                </ul>
+                <h1>404 Not Found</h1>
+                <p>No route found for <code><?= htmlspecialchars($uri) ?></code>.</p>
+                <p><a href="/login">Back to login</a></p>
             </body>
             </html>
             <?php

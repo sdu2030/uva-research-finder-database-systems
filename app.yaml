@@ -1,5 +1,5 @@
 runtime: php83
-entrypoint: serve index.php  # or student.php if you're testing just that
+entrypoint: serve index.php  
 
 env_variables:
   DB_USER: "cs4750-research-page"

@@ -9,8 +9,7 @@ $db_name = getenv('DB_NAME') ?: 'research_info';
 $instance_connection_name = getenv('CLOUD_SQL_CONNECTION_NAME')
     ?: 'cs4750-db-group:us-east4:cs4750-research-page';
 
-// If CLOUD_SQL_CONNECTION_NAME is set, assume we are on App Engine
-// and use the Cloud SQL Unix socket. This is the recommended method.
+/
 if (!empty($instance_connection_name)) {
     $dsn = sprintf(
         'mysql:unix_socket=/cloudsql/%s;dbname=%s;charset=utf8mb4',
@@ -18,8 +17,7 @@ if (!empty($instance_connection_name)) {
         $db_name
     );
 } else {
-    // Local fallback: use public IP + port (only if you're testing from a machine
-    // whose IP is added to Authorized Networks in Cloud SQL).
+    
     $host = '35.245.184.229';
     $port = 3306;
     $dsn = sprintf(
