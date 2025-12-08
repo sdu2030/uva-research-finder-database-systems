@@ -1,332 +1,188 @@
 <?php
 session_start();
-require_once 'connect-db.php';
+require('connect-db.php');
+require('project-db.php');
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-$uid   = $_SESSION['uid'] ?? null;
-$name  = $_SESSION['name'] ?? null;
-
-// --- Keyword filter from dropdown ---
-$selectedKeyword = $_GET['keyword'] ?? 'none';
-
-// Data containers
-$keywordProjects  = [];
-$flaggedProjects  = [];
-$recommended      = [];
-
-$keywordError     = '';
-$flaggedError     = '';
-$recommendedError = '';
-
-// --- 1) Projects by selected keyword ---
-if ($selectedKeyword !== 'none') {
-    try {
-        $sql = "
-            SELECT DISTINCT
-              p.PID,
-              p.title,
-              GROUP_CONCAT(pk.keyword ORDER BY pk.keyword SEPARATOR ', ') AS keywords
-            FROM Project p
-            JOIN Project_keywords pk ON pk.PID = p.PID
-            WHERE pk.keyword = :kw
-            GROUP BY p.PID, p.title
-            ORDER BY p.PID DESC
-            LIMIT 20
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([':kw' => $selectedKeyword]);
-        $keywordProjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        $keywordError = $e->getMessage();
-    }
+// ----------------------
+// AUTH GUARD
+// ----------------------
+if (!isset($_SESSION["loggedIn"]) || $_SESSION["loggedIn"] !== true) {
+    header("Location: login.php");
+    exit;
 }
 
-// --- 2) Flagged projects for this student (marks_interest) ---
-if ($uid) {
-    try {
-        $sql = "
-            SELECT
-              p.PID,
-              p.title,
-              GROUP_CONCAT(pk.keyword ORDER BY pk.keyword SEPARATOR ', ') AS keywords
-            FROM marks_interest mi
-            JOIN Project p ON mi.PID = p.PID
-            LEFT JOIN Project_keywords pk ON pk.PID = p.PID
-            WHERE mi.UID = :uid
-            GROUP BY p.PID, p.title
-            ORDER BY p.PID DESC
-            LIMIT 20
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([':uid' => $uid]);
-        $flaggedProjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        $flaggedError = $e->getMessage();
-    }
+$currentUser = $_SESSION["currentUser"] ?? null;
+if (!$currentUser || !isset($currentUser["UID"])) {
+    // Session is weird or incomplete -> force re-login
+    header("Location: login.php");
+    exit;
+}
 
-    // --- 3) Projects matching student qualifications ---
-    // Student_qualifications(UID, qualification)
-    // Project_qualifications(PID, qualification)
-    try {
-        $sql = "
-            SELECT DISTINCT
-              p.PID,
-              p.title,
-              GROUP_CONCAT(DISTINCT pk.keyword ORDER BY pk.keyword SEPARATOR ', ') AS keywords
-            FROM Student_qualifications sq
-            JOIN Project_qualifications pq
-              ON sq.qualification = pq.qualification
-            JOIN Project p
-              ON pq.PID = p.PID
-            LEFT JOIN Project_keywords pk
-              ON pk.PID = p.PID
-            WHERE sq.UID = :uid
-            GROUP BY p.PID, p.title
-            ORDER BY p.PID DESC
-            LIMIT 20
-        ";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([':uid' => $uid]);
-        $recommended = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        $recommendedError = $e->getMessage();
-    }
+$uid          = $currentUser["UID"];              // e.g., akp5ve
+$name         = $currentUser["name"] ?? $uid;
+$isResearcher = $_SESSION["isResearcher"] ?? false;
+
+// If a researcher somehow hits student.php, reroute them
+if ($isResearcher) {
+    header("Location: prof_details.php");
+    exit;
+}
+
+// Keep a simple UID alias for legacy code (e.g., projects.php)
+$_SESSION["uid"] = $uid;
+
+// ----------------------
+// 1) Projects the student has flagged (marks_interest)
+// ----------------------
+$flagged_projects = [];
+try {
+    $flagged_sql = "
+        SELECT p.*
+        FROM Projects p
+        INNER JOIN marks_interest m ON p.PID = m.PID
+        WHERE m.UID = :uid
+    ";
+    $flagged_stmt = $db->prepare($flagged_sql);
+    $flagged_stmt->execute([':uid' => $uid]);
+    $flagged_projects = $flagged_stmt->fetchAll();
+} catch (PDOException $e) {
+    // Optional: log error
+    // error_log('Flagged projects error: ' . $e->getMessage());
+}
+
+// ----------------------
+// 2) Projects that match this student's qualifications
+//    Student_qualifications(UID, qualification)
+//    Project_qualifications(PID, qualification)
+// ----------------------
+$matching_projects = [];
+try {
+    $match_sql = "
+        SELECT DISTINCT p.*
+        FROM Projects p
+        INNER JOIN Project_qualifications pq ON p.PID = pq.PID
+        INNER JOIN Student_qualifications sq 
+            ON sq.qualification = pq.qualification
+        WHERE sq.UID = :uid
+    ";
+    $match_stmt = $db->prepare($match_sql);
+    $match_stmt->execute([':uid' => $uid]);
+    $matching_projects = $match_stmt->fetchAll();
+} catch (PDOException $e) {
+    // Optional: log error
+    // error_log('Matching projects error: ' . $e->getMessage());
 }
 ?>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>HooResearches — Student Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>HooResearches – Student Portal</title>
-    <meta name="description" content="Student page for HooResearches, a UVa CS research finder.">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="text-left text-bg-dark m-3 p-3">
-    <h1>HooResearches</h1>
-    <p>A UVa CS research finder</p>
-</div>
+<?php require('header.php'); ?>
 
-<div class="container mb-5">
-
-    <!-- Header -->
+<div class="container mt-4">
+    <!-- Header / identity + navigation -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="h4 mb-1">Student Portal</h2>
-            <?php if ($uid): ?>
-                <small class="text-muted">
-                    Logged in as <strong><?= htmlspecialchars($uid) ?></strong>
-                    <?= $name ? " (" . htmlspecialchars($name) . ")" : "" ?>
-                </small>
-            <?php else: ?>
-                <small class="text-muted">
-                    Browsing as guest. Sign in to flag projects and get personalized matches.
-                </small>
-            <?php endif; ?>
+            <h3>Student Dashboard</h3>
+            <p class="mb-0">
+                Signed in as
+                <strong><?php echo htmlspecialchars($name); ?></strong>
+                (<?php echo htmlspecialchars($uid); ?>)
+            </p>
         </div>
-        <div class="btn-group">
-            <a href="login.php" class="btn btn-outline-secondary btn-sm">Back to Login</a>
+        <div class="d-flex gap-2">
+            <a href="projects.php" class="btn btn-outline-primary btn-sm">
+                Browse All Projects
+            </a>
         </div>
     </div>
 
-    <!-- Primary actions -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Browse All Projects</h5>
-                    <p class="card-text">
-                        See all available research projects. You can filter further on the projects page.
-                    </p>
-                    <a href="projects.php" class="btn btn-primary">Browse Projects</a>
-                </div>
-            </div>
-        </div>
-
-        <?php if ($uid): ?>
-        <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Matched to Your Qualifications</h5>
-                    <p class="card-text">
-                        We match your qualifications to project requirements using your stored profile.
-                    </p>
-                    <p class="text-muted small mb-0">
-                        (Using <code>Student_qualifications</code> and <code>Project_qualifications</code>.)
-                    </p>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Keyword -> projects section -->
+    <!-- Flagged Projects -->
     <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h3 class="h5 mb-0">Find Projects by Keyword</h3>
-            <small class="text-muted">Select a keyword to see matching projects.</small>
-        </div>
-
-        <form class="row g-2 align-items-end mb-3" method="get" action="student.php">
-            <div class="col-md-6">
-                <label for="keyword" class="form-label fw-bold">Keyword</label>
-                <select name="keyword" id="keyword" class="form-select">
-                    <option value="none">– Select a keyword –</option>
-                    <?php
-                    $keywordsList = [
-                        "machine learning", "GPU", "CS and medicine", "smart devices", "x86",
-                        "web development", "CS education", "LLMs", "parallel computing",
-                        "game development", "VR", "cybersecurity", "databases",
-                        "artificial intelligence", "cryptocurrency", "software testing",
-                        "cloud computing", "networks", "memory"
-                    ];
-                    foreach ($keywordsList as $kw):
-                    ?>
-                        <option value="<?= htmlspecialchars($kw) ?>"
-                            <?= ($selectedKeyword === $kw) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($kw) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-outline-primary w-100 mt-2">Show Projects</button>
-            </div>
-        </form>
-
-        <?php if (!empty($keywordError)): ?>
-            <div class="alert alert-danger">
-                Error loading keyword projects: <?= htmlspecialchars($keywordError) ?>
-            </div>
-        <?php elseif ($selectedKeyword !== 'none'): ?>
-            <?php if (empty($keywordProjects)): ?>
-                <p class="text-muted">
-                    No projects found with keyword <strong><?= htmlspecialchars($selectedKeyword) ?></strong>.
-                </p>
-            <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle">
-                        <thead class="table-secondary">
+        <h4>Your Flagged Projects</h4>
+        <?php if (empty($flagged_projects)): ?>
+            <p class="text-muted">You haven’t flagged any projects yet.</p>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-secondary">
                         <tr>
                             <th>Title</th>
+                            <th>Researcher</th>
+                            <th>Paid/Credit</th>
                             <th>Keywords</th>
                         </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($keywordProjects as $p): ?>
-                            <tr>
-                                <td>
-                                    <a href="project_details.php?pid=<?= urlencode($p['PID']) ?>"
-                                       class="text-decoration-none">
-                                        <?= htmlspecialchars($p['title']) ?>
-                                    </a>
-                                </td>
-                                <td><?= htmlspecialchars($p['keywords'] ?? '') ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="text-muted small">Showing up to 20 matching projects.</p>
-            <?php endif; ?>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($flagged_projects as $proj): ?>
+                        <tr>
+                            <td>
+                                <a href="project_details.php?pid=<?php echo $proj['PID']; ?>">
+                                    <?php echo htmlspecialchars($proj['title']); ?>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="prof_details.php?prof=<?php echo $proj['UID']; ?>">
+                                    <?php echo getResearcher($proj['PID']); ?>
+                                </a>
+                            </td>
+                            <td><?php echo htmlspecialchars($proj['paid_credit']); ?></td>
+                            <td><?php echo getKeywords($proj['PID']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php endif; ?>
     </div>
 
-    <?php if ($uid): ?>
-        <!-- Flagged projects -->
-        <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h3 class="h5 mb-0">Your Flagged Projects</h3>
-                <small class="text-muted">Projects you’ve marked as interested.</small>
-            </div>
+    <hr>
 
-            <?php if (!empty($flaggedError)): ?>
-                <div class="alert alert-danger">
-                    Error loading flagged projects: <?= htmlspecialchars($flaggedError) ?>
-                </div>
-            <?php elseif (empty($flaggedProjects)): ?>
-                <p class="text-muted">
-                    You haven’t flagged any projects yet. Open a project and use “Mark as interested”.
-                </p>
-            <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle">
-                        <thead class="table-secondary">
+    <!-- Projects Matching Qualifications -->
+    <div class="mb-4">
+        <h4>Projects Matching Your Qualifications</h4>
+        <?php if (empty($matching_projects)): ?>
+            <p class="text-muted">No projects currently match your qualifications.</p>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-secondary">
                         <tr>
                             <th>Title</th>
+                            <th>Researcher</th>
+                            <th>Paid/Credit</th>
                             <th>Keywords</th>
                         </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($flaggedProjects as $p): ?>
-                            <tr>
-                                <td>
-                                    <a href="project_details.php?pid=<?= urlencode($p['PID']) ?>"
-                                       class="text-decoration-none">
-                                        <?= htmlspecialchars($p['title']) ?>
-                                    </a>
-                                </td>
-                                <td><?= htmlspecialchars($p['keywords'] ?? '') ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Recommended projects by qualifications -->
-        <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h3 class="h5 mb-0">Projects Matching Your Qualifications</h3>
-                <small class="text-muted">Based on your stored qualifications.</small>
-            </div>
-
-            <?php if (!empty($recommendedError)): ?>
-                <div class="alert alert-danger">
-                    Error loading recommended projects: <?= htmlspecialchars($recommendedError) ?>
-                </div>
-            <?php elseif (empty($recommended)): ?>
-                <p class="text-muted">
-                    No recommended projects found based on your current qualifications.
-                    You can still browse all projects above.
-                </p>
-            <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle">
-                        <thead class="table-secondary">
+                    </thead>
+                    <tbody>
+                    <?php foreach ($matching_projects as $proj): ?>
                         <tr>
-                            <th>Title</th>
-                            <th>Keywords</th>
+                            <td>
+                                <a href="project_details.php?pid=<?php echo $proj['PID']; ?>">
+                                    <?php echo htmlspecialchars($proj['title']); ?>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="prof_details.php?prof=<?php echo $proj['UID']; ?>">
+                                    <?php echo getResearcher($proj['PID']); ?>
+                                </a>
+                            </td>
+                            <td><?php echo htmlspecialchars($proj['paid_credit']); ?></td>
+                            <td><?php echo getKeywords($proj['PID']); ?></td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($recommended as $p): ?>
-                            <tr>
-                                <td>
-                                    <a href="project_details.php?pid=<?= urlencode($p['PID']) ?>"
-                                       class="text-decoration-none">
-                                        <?= htmlspecialchars($p['title']) ?>
-                                    </a>
-                                </td>
-                                <td><?= htmlspecialchars($p['keywords'] ?? '') ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="text-muted small">Showing up to 20 recommended projects.</p>
-            <?php endif; ?>
-        </div>
-    <?php endif; ?>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
+<?php require('footer.php'); ?>
 </body>
 </html>

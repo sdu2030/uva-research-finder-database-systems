@@ -8,7 +8,7 @@ $username = $password = $error = "";
 if(isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"] === true) {
     if($_SESSION["isResearcher"] === true)
     {
-        header("location: prof_details.php");
+        header("location: professor.php");
     } else {
         header("location: projects.php");
     }
@@ -34,7 +34,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["currentUser"] = $current_user;
             $_SESSION["isResearcher"] = is_researcher($current_user["UID"]);
             if ($_SESSION["isResearcher"] === true) {
-                header("location: prof_details.php");
+                header("location: professor.php");
             } else {
                 header("location: projects.php");
             }

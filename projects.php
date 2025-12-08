@@ -6,6 +6,9 @@ require('connect-db.php');
 require('project-db.php');
 #$list_of_projects = getAllProjects();
 
+// NEW: read researcher flag from session (set in login.php)
+$isResearcher = $_SESSION["isResearcher"] ?? false;
+
 if (isset($_GET['pid'])) {
     $_SESSION['pid'] = $_GET['pid'];
     header("Location: project_details.php");
@@ -31,7 +34,6 @@ if (isset($_POST['applyBtn'])) {
     $researcher = $_POST['researcher'] ?? "";
     $pcr = $_POST['p_cr'] ?? "none";
     $_SESSION['pcr'] = $pcr;
-
 
     $list_of_projects = applyFilters($keyword, $researcher, $pcr);
 } 
@@ -65,6 +67,20 @@ $interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
 <hr/>
 <div class="container">
 <h3>All Projects</h3>
+
+<!-- NEW: back button based on whether user is a researcher or student -->
+<div class="d-flex justify-content-end mb-3">
+  <?php if ($isResearcher): ?>
+    <a href="prof_details.php" class="btn btn-outline-secondary btn-sm">
+      Go to Professor Page
+    </a>
+  <?php else: ?>
+    <a href="student.php" class="btn btn-outline-secondary btn-sm">
+      Go to Student Page
+    </a>
+  <?php endif; ?>
+</div>
+
 <h5>Search</h5>
 <div style="display: flex; gap: 20px; align-items: center;">
     <div>
@@ -206,7 +222,7 @@ $interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
   -->
 
   </form>
- 
+  
 
 
     </td>
