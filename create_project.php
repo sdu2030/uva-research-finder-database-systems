@@ -55,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <select name="paid_credit" id="paid_credit">
                     <option value="paid">Paid</option>
                     <option value="credit">Credit</option>
+                    <option value="either">Either</option>
                 </select>
             </div>
             <div class="col-sm-7">

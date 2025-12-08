@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 addStudentQual($_POST['username'], $student_qual);
             }
         }
-        // header("location: login.php");
+        header("location: login.php");
     } else if (isset($_POST['profBtn'])) {
         createPerson($_POST['username'], $_POST['password'], $_POST['person_desc'], $_POST['name']);
         setRole($_POST['username'], $_POST['research_role']);
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($_POST['courses_taught'])) {
             addCoursesTaught($_POST['username'], $_POST['courses_taught']);
         }
-        // header("location: login.php");
+        header("location: login.php");
     }
 }
 ?>

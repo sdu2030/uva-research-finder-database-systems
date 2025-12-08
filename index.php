@@ -43,8 +43,11 @@ switch ($path) {
 
     case '/update_project.php':
         require 'update_project.php';
+        break;  
+    
+    case '/create_person.php':
+        require 'create_person.php';
         break;
-
     // ---------- FALLBACK ----------
     default:
         http_response_code(404);
