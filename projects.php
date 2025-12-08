@@ -8,9 +8,20 @@ require('project-db.php');
 $_SESSION['uid'] = 'akp5ve';
 
 if (isset($_GET['pid'])) {
-    $_SESSION['selected_project'] = $_GET['pid'];
+    $_SESSION['pid'] = $_GET['pid'];
     header("Location: project_details.php");
     exit();
+}
+
+if (isset($_POST['interested']) && isset($_POST['pid'])) {
+    $pid = $_POST['pid'];
+    $uid = $_SESSION['uid'];
+
+    if ($_POST['interested']) {
+        markInterested($uid, $pid);   // your function to mark interest
+    } else {
+        unmarkInterested($uid, $pid); // function to remove interest
+    }
 }
 
 if (isset($_POST['applyBtn'])) {
@@ -100,7 +111,7 @@ else{
 
 
 <div class="row justify-content-center">  
-<table class="w3-table w3-bordered w3-card-4 center" style="width:100%">
+<table class="table table-bordered" style="width:100%">
   <thead> <!--header columns of table ; tr for row, td for column -->
   <tr style="background-color:#B0B0B0">
     <th width="30%"><b>Interested</b></th>
@@ -119,11 +130,14 @@ else{
 <!--    create some logic to pull these associated values -->
   <tr>
     <td>
-      <input type = "checkbox" 
-        disabled
-        <?php if (getInterestedValue($_SESSION['uid'],$proj_info['PID']) )echo 'checked'; ?>> </td>
-    <td>
-      <a href="projects.php?pid=<?php echo $proj_info['PID']; ?>" class="button">
+      <form method="POST" action="projects.php">
+        <input type="hidden" name="pid" value="<?php echo $proj_info['PID']; ?>">
+        <input type="checkbox" name="interested" onchange="this.form.submit()"
+        <?php if (getInterestedValue($_SESSION['uid'],$proj_info['PID'])) echo 'checked'; ?>>
+      </form>
+</td>
+<td>
+      <a href="project_details.php?pid=<?php echo $proj_info['PID']; ?>" class="button">
         <?php echo $proj_info['title']; ?>
     </a>
        </td> 

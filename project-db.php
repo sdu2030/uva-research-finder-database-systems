@@ -1,11 +1,13 @@
 <?php
 
+
+
 require_once("connect-db.php");
 
 function getAllProjects()
 {
     global $db;
-    $query = "SELECT * FROM Project ORDER BY title DESC";
+    $query = "SELECT * FROM Project WHERE !filled ORDER BY title DESC";
     $statement = $db->prepare($query);
     $statement->execute();
     $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -325,5 +327,36 @@ function addProjectQual($PID, $qualification)
     catch (Exception $e) {
         echo $e->getMessage();
     }
+}
+
+function markInterested($uid, $pid)
+{
+   global $db;
+   $query = "INSERT INTO Marks_interest (UID, PID) VALUES (:uid, :pid)";
+   try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':uid', $uid);
+        $statement->bindValue(':pid', $pid);
+        $statement->execute();
+        $statement->closeCursor();
+    }
+    catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    catch (Exception $e) {
+        echo $e->getMessage();
+    }
+
+}
+
+function unmarkInterested($uid, $pid)
+{
+    global $db;
+    $query = "DELETE FROM Marks_interest WHERE PID=:uid AND UID=:uid";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':uid', $uid);
+    $statement->bindValue(':pid', $pid);
+    $statement->execute();
+    $statement->closeCursor();
 }
 ?>

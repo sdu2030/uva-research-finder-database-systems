@@ -4,9 +4,22 @@ require('connect-db.php');
 require('project-db.php');
 require('prof-db.php');
 $_SESSION['uid'] = 'akp5ve';
+var_dump($_SESSION);
+var_dump($_GET);
 
 if (isset($_GET['pid'])) {
     $_SESSION['pid'] = $_GET['pid'];
+}
+
+if (isset($_POST['interested'])) {
+    $pid = $_SESSION['pid'];
+    $uid = $_SESSION['uid'];
+
+    if ($_POST['interested']) {
+        markInterested($uid, $pid);   // your function to mark interest
+    } else {
+        unmarkInterested($uid, $pid); // function to remove interest
+    }
 }
 
 ?>
@@ -30,37 +43,45 @@ if (isset($_GET['pid'])) {
     <p>A UVa CS research finder</p>
 </div>
 <form>
-    <h3 class="text-center"><?php echo getTitle($_SESSION['pid'])?></h3>
+    <h2 class="text-center"><?php echo getTitle($_SESSION['pid'])?></h3>
     <div class="row mb-3 justify-content-center">
         
-    <div class="row mb-3 justify-content-center">
-        <div class="col-sm-10">
-            <label for="researcher" class="form-label fw-bold">Researcher</label>
-            <div>
+    <div class="text-center">
+        <div>
+            <label for="researcher" class="form-label fw-bold">Researcher: </label>
+            
                 <a href="prof_details.php?prof=<?php echo getResearcherId($_SESSION['pid']); ?>">
                 <?php echo getResearcher($_SESSION['pid']); ?>
             </a>
-            </div>
+            
         </div>
     </div>
 
+    
+
     <div class="row mb-3 justify-content-center">
         <div class="form-check col-sm-3">
-            <input class="form-check-input" type="checkbox" id="interest" 
-                <?php if (getInterestedValue($_SESSION['uid'],$_SESSION['pid']) )echo 'checked'; ?>>
-            <label class="form-check-label fw-bold" for="paid">Interested?</label>
+            <form method="POST" action="project_details.php">
+                <label class="form-label fw-bold"> Interested </label>
+        <input type="checkbox" name="interested" onchange="this.form.submit()"
+        <?php if (getInterestedValue($_SESSION['uid'],$_SESSION['pid'])) echo 'checked'; ?>>
+      </form>
         </div>
 
         <div class="col-sm-3">
             <label for="pcr" class="form-label fw-bold">Paid or Credit?</label>
             <div >
+                <p class="border p-1" >
                 <?php echo getPaid_Credit($_SESSION['pid']);?>
+                </p>
         </div>
         </div>
         <div class="col-sm-3">
             <label for="numStudents" class="form-label fw-bold">Number of Students</label>
             <div >
+                <p class="border p-1">
                 <?php echo getNumStudents($_SESSION['pid']);?>
+                </p>
         </div>
         </div>
     </div>
@@ -69,7 +90,9 @@ if (isset($_GET['pid'])) {
         <div class="col-sm-10">
             <label for="projectDesc" class="form-label fw-bold">Description</label>
             <div>
+                <p class="border p-2">
                 <?php echo getDescription($_SESSION['pid']);?>
+                </p>
             </div>
         </div>
     </div>
@@ -78,7 +101,9 @@ if (isset($_GET['pid'])) {
         <div class="col-sm-10">
             <label for="keywords" class="form-label fw-bold">Keywords</label>
             <div>
+                <p class="border p-2">
                 <?php echo getKeywords($_SESSION['pid']);?>
+                </p>
             </div>
         </div>
     </div>
@@ -87,7 +112,9 @@ if (isset($_GET['pid'])) {
         <div class="col-sm-10">
             <label for="qualifications" class="form-label fw-bold">Qualifications</label>
             <div>
+                <p class="border p-2">
                 <?php echo getQualifications($_SESSION['pid']);?>
+                </p>
             </div>
         </div>
     </div>
