@@ -127,14 +127,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </div>
 </form>
-<div class="row mt-3 justify-content-center">
+<?php if ($_SESSION['currentUser']['UID'] == getProjectById($_SESSION['pid'])['UID']) {
+    echo '<div class="row mt-3 justify-content-center">
     <form method="post" id="update" name="update">
         <button type="submit" class="btn btn-primary col-sm-10" id="updateBtn" name="updateBtn">Update</button>
     </form>
     <form method="post" id="delete" name="delete">
         <button type="submit" class="btn btn-primary col-sm-10" id="deleteBtn" name="deleteBtn">Delete</button>
     </form>
-</div>
+</div>';
+}
+?>
 
 <?php require("footer.php"); ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
