@@ -101,7 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-sm-10" id="qualsBlock" style="display: block;">
                 <label for="student_quals" class="form-label fw-bold">Qualifications</label>
                 <select name="student_quals[]" id="student_quals" multiple="multiple">
-                    <option value="python">Python</option>
+                    <option value="cs2100">CS 2100 - Data Structures and Algorithms 1</option>
+                    <option value="cs2120">CS 2120 - Discrete Mathematics and Theory 1</option>
+                    <option value="cs2130">CS 2130 - Computer Systems and Organization 1</option>
+                    <option value="cs3100">CS 3100 - Data Structures and Algorithms 2</option>
+                    <option value="cs3120">CS 3120 - Discrete Mathematics and Theory 2</option>
+                    <option value="cs3130">CS 3130 - Computer Systems and Organization 2</option>
+                    <option value="cs3140">CS 3140 - Software Development Essentials</option>
+                    <option value="cs3240">CS 3240 - Software Engineering</option>
                 </select>
             </div>
         </div>
