@@ -7,8 +7,20 @@ require_once("connect-db.php");
 function getAllProjects()
 {
     global $db;
-    $query = "SELECT * FROM Project WHERE !filled ORDER BY title DESC";
+    $query = "SELECT * FROM Project WHERE !filled ORDER BY title DESC;";
     $statement = $db->prepare($query);
+    $statement->execute();
+    $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $statement->closeCursor();
+    return $projs;
+}
+
+function searchProjects($search)
+{
+    global $db;
+    $query = "SELECT * FROM Project WHERE !filled AND title LIKE :search ORDER BY title DESC;";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':search', '%'.$search.'%');
     $statement->execute();
     $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
     $statement->closeCursor();
@@ -77,13 +89,13 @@ function getQualifications($pid)
 function applyFilters($keyword, $researcher, $pcr)
 {
     global $db;
-    echo $keyword;
-    echo "\n";
+    //echo $keyword;
+    //echo "\n";
 
     if ($keyword == "" && $researcher == "" && $pcr == "none"){
         return getAllProjects();
     }
-    //if ($keyword == "-none-" && $researcher == "" &&$pcr!= "none"){
+    //just paid or credit filter
     if ($keyword == "none" && $researcher == "" && $pcr!= "none"){
 
         $statement = $db->prepare("SELECT * FROM Project WHERE paid_credit=:pcr ORDER BY title DESC");
@@ -94,6 +106,58 @@ function applyFilters($keyword, $researcher, $pcr)
         return $projs;
 
     }
+
+
+    //just researcher filter
+    if ($keyword =="none" && $researcher != "" && $pcr == "none"){
+        $uids = queryResearcherUID($researcher);
+        $names = implode(", ",$uids);
+        if (empty($uids)) {
+            return [];  // No matches, return empty result
+        }
+
+        $placeholders = [];
+        foreach ($uids as $i => $uid) {
+            $placeholders[] = ":uid$i";
+        }
+        $inClause = implode(",", $placeholders);
+        $statement = $db->prepare("SELECT * FROM Project WHERE UID IN ($inClause) ORDER BY title DESC;");
+        foreach ($uids as $i => $uid) {
+            $statement->bindValue(":uid$i", $uid);
+        }
+        $statement->execute();
+        $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $statement->closeCursor();
+        return $projs;
+    }
+
+    //just keyword filter
+    if ($keyword != "none" && $researcher =="" && $pcr =="none"){
+        $starter = $db->prepare("SELECT PID FROM Project_keywords WHERE keyword=:keyword");
+        $starter->bindValue(':keyword', $keyword);
+        $starter->execute();
+        $pids = $starter-> fetchAll(PDO::FETCH_COLUMN,0);
+        $starter->closeCursor();
+        if (empty($pids)){
+            return [];
+        }
+        $subset = [];
+        foreach ($pids as $i => $pid) {
+            $subset[] = ":pid$i";
+        }
+        $inClause = implode(",", $subset);
+       //echo $inClause;
+        $statement = $db->prepare("SELECT * FROM Project WHERE PID IN ($inClause) ORDER BY title DESC;");
+        foreach ($pids as $i => $pid) {
+            $statement->bindValue(":pid$i", $pid);
+        }
+        $statement->execute();
+        $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $statement->closeCursor();
+        return $projs;
+    }
+
+    //researcher and paid/credit filter
     if ($keyword =="none" && $researcher != "" && $pcr!="none"){
         $uids = queryResearcherUID($researcher);
         $names = implode(", ",$uids);
@@ -107,8 +171,6 @@ function applyFilters($keyword, $researcher, $pcr)
             $placeholders[] = ":uid$i";
         }
         $inClause = implode(",", $placeholders);
-        echo "researcher + pcr args \n\n";
-        echo $names;
         $statement = $db->prepare("SELECT * FROM Project WHERE paid_credit=:pcr AND UID IN ($inClause) ORDER BY title DESC;");
         $statement->bindValue(':pcr', $pcr);
         foreach ($uids as $i => $uid) {
@@ -120,7 +182,123 @@ function applyFilters($keyword, $researcher, $pcr)
         return $projs;
 
     }
-    echo "unsuccessful\n";
+
+    //keyword and paid/credit filter
+    if ($keyword != "none" && $researcher == "" && $pcr!= "none"){
+        $starter = $db->prepare("SELECT PID FROM Project_keywords WHERE keyword=:keyword");
+        $starter->bindValue(':keyword', $keyword);
+        $starter->execute();
+        $pids = $starter-> fetchAll(PDO::FETCH_COLUMN,0);
+        $starter->closeCursor();
+        if (empty($pids)){
+            return [];
+        }
+        $subset = [];
+        foreach ($pids as $i => $pid) {
+            $subset[] = ":pid$i";
+        }
+        $inClause = implode(",", $subset);
+        // $inClause;
+        $statement = $db->prepare("SELECT * FROM Project WHERE paid_credit=:pcr AND PID IN ($inClause) ORDER BY title DESC;");
+        $statement->bindValue(':pcr', $pcr);
+        foreach ($pids as $i => $pid) {
+            $statement->bindValue(":pid$i", $pid);
+        }
+        $statement->execute();
+        $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $statement->closeCursor();
+        return $projs;
+
+    }
+
+    //researcher and keyword
+    if ($keyword != "none" && $researcher != "" && $pcr == "none") {
+        $starter = $db->prepare("SELECT PID FROM Project_keywords WHERE keyword = :keyword");
+        $starter->bindValue(':keyword', $keyword);
+        $starter->execute();
+        $pids = $starter->fetchAll(PDO::FETCH_COLUMN, 0);
+        $starter->closeCursor();
+
+        if (empty($pids)) return [];
+        $subset = [];
+        foreach ($pids as $i => $pid) {
+            $subset[] = ":pid$i";
+        }
+        $inClause1 = implode(",", $subset);
+
+    
+        $uids = queryResearcherUID($researcher);
+        if (empty($uids)) return [];
+        $placeholder = [];
+        foreach ($uids as $i => $uid) {
+            $placeholder[] = ":uid$i";
+        }
+        $inClause2 = implode(",", $placeholder);
+
+        $statement = $db->prepare("SELECT * FROM Project WHERE PID IN ($inClause1) AND UID IN ($inClause2) ORDER BY title DESC");
+
+        //bind pids
+        foreach ($pids as $i => $pid) {
+            $statement->bindValue(":pid$i", $pid, PDO::PARAM_INT);
+        }
+        //bind uids
+        foreach ($uids as $i => $uid) {
+            $statement->bindValue(":uid$i", $uid, PDO::PARAM_STR); 
+        }
+
+        $statement->execute();
+        $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $statement->closeCursor();
+
+        return $projs;
+    }
+
+    //all three
+    if ($keyword != "none" && $researcher != "" && $pcr != "none") {
+        $starter = $db->prepare("SELECT PID FROM Project_keywords WHERE keyword = :keyword");
+        $starter->bindValue(':keyword', $keyword);
+        $starter->execute();
+        $pids = $starter->fetchAll(PDO::FETCH_COLUMN, 0);
+        $starter->closeCursor();
+
+        if (empty($pids)) return [];
+        $subset = [];
+        foreach ($pids as $i => $pid) {
+            $subset[] = ":pid$i";
+        }
+        $inClause1 = implode(",", $subset);
+
+    
+        $uids = queryResearcherUID($researcher);
+        if (empty($uids)) return [];
+        $placeholder = [];
+        foreach ($uids as $i => $uid) {
+            $placeholder[] = ":uid$i";
+        }
+        $inClause2 = implode(",", $placeholder);
+
+        $statement = $db->prepare("SELECT * FROM Project WHERE paid_credit=:pcr AND PID IN ($inClause1) AND UID IN ($inClause2) ORDER BY title DESC");
+
+        //bind pids
+        foreach ($pids as $i => $pid) {
+            $statement->bindValue(":pid$i", $pid, PDO::PARAM_INT);
+        }
+        //bind uids
+        foreach ($uids as $i => $uid) {
+            $statement->bindValue(":uid$i", $uid, PDO::PARAM_STR); 
+        }
+        $statement->bindValue(":pcr", $pcr);
+
+        $statement->execute();
+        $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $statement->closeCursor();
+
+        return $projs;
+    }
+
+
+
+    
     return getAllProjects();
 }
 
