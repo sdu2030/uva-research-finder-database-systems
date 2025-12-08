@@ -29,13 +29,14 @@ if (isset($_POST['applyBtn'])) {
     $researcher = $_POST['researcher'] ?? "";
     $pcr = $_POST['p_cr'] ?? "none";
     $_SESSION['pcr'] = $pcr;
-    echo $_POST['keyword'];
-    echo $_SESSION['pcr'];
+
 
     $list_of_projects = applyFilters($keyword, $researcher, $pcr);
-} //else if (!empty($_POST['projRedir'])){
-   // $pid = $_POST['projRedir'];
-//}
+} 
+else if (isset($_POST['searchBtn'])) {
+    $search = $_POST['search'] ?? "";
+    $list_of_projects = searchProjects($search);
+}
 else{
     $list_of_projects = getAllProjects();
 }
@@ -58,12 +59,14 @@ else{
 <body>
 <?php require ("header.php"); ?>
 
+
 <hr/>
 <div class="container">
 <h3>All Projects</h3>
 <h5>Search</h5>
 <div style="display: flex; gap: 20px; align-items: center;">
     <div>
+      <form method="POST" action="projects.php">
         <label for="search">Search:</label>
         <input type="text" id="search" name="search">
   </div>
@@ -81,7 +84,24 @@ else{
     <select name="keyword" id="keyword">
       <option value="none"> -none- </option>
       <option value="machine learning">machine learning</option>
-      <option value="os">OS</option>
+      <option value="GPU">GPU</option>
+      <option value="CS and medicine">CS and medicine</option>
+      <option value="smart devices">smart devices</option>
+      <option value="x86">x86</option>
+      <option value="web development">web development</option>
+      <option value="CS education">CS education</option>
+      <option value="LLMs">LLMs</option>
+      <option value="parallel computing">parallel computing</option>
+      <option value="game development">game development</option>
+      <option value="VR">VR</option>
+      <option value="cybersecurity">cybersecurity</option>
+      <option value="databases">databases</option>
+      <option value="artificial intelligence">artificial intelligence</option>
+      <option value="cryptocurrency">cryptocurrency</option>
+      <option value="software testing">software testing</option>
+      <option value="cloud computing">cloud computing</option>
+      <option value="networks">networks</option>
+      <option value="memory">memory</option>
     </select>
   </div>
   <div>
@@ -91,10 +111,10 @@ else{
   <div>
     <label for="p_cr">Paid or Credit:</label>
     <select name="p_cr" id="p_cr">
-      <option value="selected" ><?php $_SESSION['pcr'];?></option>
       <option value="none">-none-</option>
       <option value="paid">Paid</option>
       <option value="credit">Credit</option>
+       <option value="either">Either</option>
     </select>
   </div>
   <div>
@@ -134,13 +154,24 @@ else{
       </form>
 </td>
 <td>
+
       <a href="project_details.php?pid=<?php echo $proj_info['PID']; ?>" class="button">
+
         <?php echo $proj_info['title']; ?>
+
     </a>
+
        </td> 
-    <td><?php echo $proj_info['UID']; ?> </td> 
+
+    <td><a href="prof_details.php?prof=<?php echo $proj_info['UID']?>">
+
+                <?php echo getResearcher($proj_info['PID']); ?>
+
+            </a> </td> 
+
     <td><?php echo $proj_info['paid_credit']; ?> </td>
-    <td><?php echo (string) $proj_info['num_students']; ?> </td>  
+
+    <td><?php echo (string) $proj_info['num_students']; ?> </td> 
     <td><?php echo getKeywords($proj_info['PID']); ?> </td> 
     <td><?php echo getQualifications($proj_info['PID']); ?> </td> 
     
