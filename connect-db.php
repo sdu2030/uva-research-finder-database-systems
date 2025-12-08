@@ -1,60 +1,38 @@
 <?php
-// Remember to start the database server (or GCP SQL instance) before trying to connect to it
-////////////////////////////////////////////
-/** F25, PHP (on Google Standard App Engine) connect to MySQL instance (GCP) **/
-// $username = 'root';                       // or your username
-// $password = 'your-root-password';     
-// $host = 'instance-connection-name';       // e.g., 'cs4750:us-east4:db-demo'; 
-// $dbname = 'your-database-name';           // e.g., 'guestbook';
-// $dsn = "mysql:unix_socket=/cloudsql/instance-connection-name;dbname=your-database-name";
-//       e.g., "mysql:unix_socket=/cloudsql/cs4750:us-east4:db-demo;dbname=guestbook";
+// connect-db.php
+// Shared DB connection for all pages (login, student, professor, projects, etc.)
 
-// to get instance connection name, go to GCP SQL overview page
-////////////////////////////////////////////
+// Read settings from environment variables (set in app.yaml)
+$db_user = getenv('DB_USER') ?: 'cs4750-research-page';
+$db_pass = getenv('DB_PASS') ?: 'researchDB_25';
+$db_name = getenv('DB_NAME') ?: 'research_info';
+$instance_connection_name = getenv('INSTANCE_CONNECTION_NAME') ?: 'cs4750-db-group:us-east4:cs4750-research-page';
 
-/** F25, PHP (on local XAMPP or CS server) connect to MySQL instance (GCP) **/
-$username = 'cs4750-research-page';
-$password = 'researchDB_25';
-$host = 'cs4750-db-group:us-east4:cs4750-research-page';       // e.g., 'cs4750:us-east4:db-demo'; 
-$dbname = 'research_info';          // e.g., 'guestbook';
-$dsn = "mysql:host=35.245.184.229;dbname=$dbname";   // connect PHP (XAMPP) to DB (GCP)
-//     e.g., "mysql:host=99.99.999.99;dbname=$dbname";   
+// Default: assume we're running on App Engine and use the unix socket
+// /cloudsql/INSTANCE_CONNECTION_NAME  (App Engine automatically provides this)
+$dsn = "mysql:unix_socket=/cloudsql/$instance_connection_name;dbname=$db_name;charset=utf8mb4";
 
-// to get public IP addres of the SQL instance, go to GCP SQL overview page
+// Optional: if you're running locally with php -S or similar and want to use the
+// PUBLIC IP instead of the socket, you can uncomment this block and set LOCAL_DEV=1
+//
+// if (php_sapi_name() === 'cli-server' || getenv('LOCAL_DEV')) {
+//     $host = '35.245.184.229';  // Cloud SQL public IP (from instance Overview page)
+//     $dsn = "mysql:host=$host;dbname=$db_name;charset=utf8mb4";
+// }
 
-// To connect from a local PHP to GCP SQL instance, need to add authormized network
-// to allow (my)machine to connect to the SQL instance. 
-// 1. Get IP of the computer that tries to connect to the SQL instance
-//    (use http://ipv4.whatismyv6.com/ to find the IP address)
-// 2. On the SQL connections page, add authorized networks, enter the IP address
-////////////////////////////////////////////
-
-/** F25, PHP (on GCP, local XAMPP, or CS server) connect to MySQL (on local XAMPP) **/
-//$host = 'localhost:3306';
-//$dbname = 'maintenance_system';    // voting_system
-//$dsn = "mysql:host=$host;dbname=$dbname";  
-
-
-/** connect to the database **/
-try 
-{
-   //$db = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-   $db = new PDO($dsn, $username, $password);
-   
-   // dispaly a message to let us know that we are connected to the database 
-   echo "<p>You are connected to the database -- host=$host</p>";
+try {
+    $db = new PDO(
+        $dsn,
+        $db_user,
+        $db_pass,
+        [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]
+    );
+} catch (PDOException $e) {
+    // You can customize this, but for now it's helpful to see the error while debugging
+    echo "<h3>Database connection failed</h3>";
+    echo "<pre>" . htmlspecialchars($e->getMessage()) . "</pre>";
+    exit;
 }
-catch (PDOException $e)     // handle a PDO exception (errors thrown by the PDO library)
-{
-   // Call a method from any object, use the object's name followed by -> and then method's name
-   // All exception objects provide a getMessage() method that returns the error message 
-   $error_message = $e->getMessage();        
-   echo "<p>An error occurred while connecting to the database: $error_message </p>";
-}
-catch (Exception $e)       // handle any type of exception
-{
-   $error_message = $e->getMessage();
-   echo "<p>Error message: $error_message </p>";
-}
-
-?>
