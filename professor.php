@@ -38,7 +38,7 @@ function current_query_params_prof(array $overrides = []): string {
     <div class="d-flex gap-2">
         <a href="login.php" class="btn btn-outline-light btn-sm btn-back">← Back to Home</a>
         <!-- Create project button -->
-        <a href="create-project.php" class="btn btn-warning btn-sm">
+        <a href="create-proj.php" class="btn btn-warning btn-sm">
             + Create New Project
         </a>
         <!-- If your teammate used a different filename, update the href above -->
