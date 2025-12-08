@@ -70,7 +70,7 @@ try {
             <a href="projects.php" class="btn btn-outline-primary btn-sm">
                 Browse All Projects
             </a>
-            <a href="creat-proj.php" class="btn btn-primary btn-sm">
+            <a href="create_project.php" class="btn btn-primary btn-sm">
                 + Create New Project
             </a>
         </div>
