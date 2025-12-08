@@ -9,6 +9,8 @@ require('prof-db.php');
 
 if (isset($_GET['prof'])) {
     $_SESSION['prof'] = $_GET['prof'];
+} else {
+    $_SESSION['prof'] = $_SESSION['currentUser']['UID'];
 }
 ?>
 

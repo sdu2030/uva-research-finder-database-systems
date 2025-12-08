@@ -414,9 +414,9 @@ function getProjectById($PID)
         $statement = $db->prepare($query);
         $statement->bindValue(':PID', $PID);
         $statement->execute();
-        $result = $statement->fetch();
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         $statement->closeCursor();
-        return $result;
+        return $result[0];
     }
     catch (PDOException $e) {
         echo $e->getMessage();

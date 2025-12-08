@@ -3,15 +3,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require('connect-db.php');
 require('project-db.php');
-// The UID of the current user should persist
-$UID = null;
-// The PID of the project to update should come from professor
 ?>
 
 <?php
+$current_project = getProjectById($_SESSION['pid']);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!empty($_POST['updateBtn'])) {
-        updateProject($_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc'], $UID);
+        updateProject($_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc'], $_SESSION['currentUser']['UID']);
         if (isset($_POST['keywords'])) {
             $selectedKeywords = $_POST['keywords'];
             foreach ($selectedKeywords as $keyword) {
@@ -43,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <?php require("header.php"); ?>
     <form method="post" action="<?php $_SERVER['PHP_SELF'] ?>" onsubmit="return validateInput()">
-        <h3 class="text-center">Create Project</h3>
+        <h3 class="text-center">Update Project</h3>
         <div class="row mb-3 justify-content-center">
             <div class="col-sm-10">
                 <label for="title" class="form-label fw-bold">Title*</label>
@@ -89,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="row justify-content-center">
             <button type="submit" class="btn btn-primary col-sm-10" id="updateBtn" name="updateBtn">Update</button>
         </div>
-        <input type="hidden" id="PID" name="PID" value="<?php echo $_POST['PID']; ?>">
+        <input type="hidden" id="PID" name="PID">
     </form>
     <?php require("footer.php"); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

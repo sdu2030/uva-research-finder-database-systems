@@ -10,6 +10,8 @@ if (isset($_GET['pid'])) {
     $_SESSION['pid'] = $_GET['pid'];
 }
 
+$_SESSION['uid'] = $_SESSION['currentUser']['UID'];
+
 if (isset($_POST['interested'])) {
     $pid = $_SESSION['pid'];
     $uid = $_SESSION['uid'];
@@ -18,6 +20,16 @@ if (isset($_POST['interested'])) {
         markInterested($uid, $pid);   // your function to mark interest
     } else {
         unmarkInterested($uid, $pid); // function to remove interest
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['updateBtn'])) {
+        header("Location: update_project.php");
+    }
+    if (isset($_POST['deleteBtn'])) {
+        deleteProject($_SESSION['pid']);
+        header("Location: prof_details.php");
     }
 }
 
@@ -115,6 +127,15 @@ if (isset($_POST['interested'])) {
         </div>
     </div>
 </form>
+<div class="row mt-3 justify-content-center">
+    <form method="post" id="update" name="update">
+        <button type="submit" class="btn btn-primary col-sm-10" id="updateBtn" name="updateBtn">Update</button>
+    </form>
+    <form method="post" id="delete" name="delete">
+        <button type="submit" class="btn btn-primary col-sm-10" id="deleteBtn" name="deleteBtn">Delete</button>
+    </form>
+</div>
+
 <?php require("footer.php"); ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
