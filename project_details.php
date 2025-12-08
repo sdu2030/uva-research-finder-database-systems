@@ -1,9 +1,14 @@
 <?php
+session_start();
 require('connect-db.php');
 require('project-db.php');
-session_start();
-$_SESSION['pid'] = 104;
+require('prof-db.php');
 $_SESSION['uid'] = 'akp5ve';
+
+if (isset($_GET['pid'])) {
+    $_SESSION['pid'] = $_GET['pid'];
+}
+
 ?>
 
 <!doctype html>
@@ -32,7 +37,9 @@ $_SESSION['uid'] = 'akp5ve';
         <div class="col-sm-10">
             <label for="researcher" class="form-label fw-bold">Researcher</label>
             <div>
-                <?php echo getResearcher($_SESSION['pid']);?>
+                <a href="prof_details.php?prof=<?php echo getResearcherId($_SESSION['pid']); ?>">
+                <?php echo getResearcher($_SESSION['pid']); ?>
+            </a>
             </div>
         </div>
     </div>
