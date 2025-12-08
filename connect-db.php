@@ -40,8 +40,9 @@ try
 {
    //$db = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
    $db = new PDO($dsn, $username, $password);
-   
-   // dispaly a message to let us know that we are connected to the database 
+   $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // dispaly a message to let us know that we are connected to the database
    echo "<p>You are connected to the database -- host=$host</p>";
 }
 catch (PDOException $e)     // handle a PDO exception (errors thrown by the PDO library)

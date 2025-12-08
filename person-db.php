@@ -1,5 +1,5 @@
 <?php
-require("connect-db.php");
+require_once("connect-db.php");
 
 function createPerson($UID, $pass, $description, $name)
 {
@@ -11,7 +11,15 @@ function createPerson($UID, $pass, $description, $name)
         $statement->bindValue(':pass', $pass);
         $statement->bindValue(':description', $description);
         $statement->bindValue(':name', $name);
-        $statement->execute();
+
+        $ok = $statement->execute();
+
+        if (!$ok) {
+            echo "<pre>";
+            print_r($statement->errorInfo());
+            echo "</pre>";
+        }
+
         $statement->closeCursor();
     }
     catch (PDOException $e) {
@@ -41,6 +49,22 @@ function addStudentQual($UID, $qualification)
     }
 }
 
+function setRole($UID, $role) {
+    global $db;
+    $query = "INSERT INTO Researcher (UID, role) VALUES (:UID, :role)";
+    try {
+        $statement = $db->prepare($query);
+        $statement->bindValue(':UID', $UID);
+        $statement->bindValue(':role', $role);
+        $statement->execute();
+        $statement->closeCursor();
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+    } catch (Exception $e) {
+        echo $e->getMessage();
+    }
+}
+
 function addResearchAreas($UID, $researchAreas)
 {
     $researchAreas = explode(",", $researchAreas);
@@ -66,7 +90,7 @@ function addPublications($UID, $publications)
     $publications = explode(",", $publications);
     foreach ($publications as $publication) {
         global $db;
-        $query = "INSERT INTO Researcher_researchAreas (UID, publications) VALUES (:UID, :publication)";
+        $query = "INSERT INTO Researcher_researchAreas (UID, publication) VALUES (:UID, :publication)";
         try {
             $statement = $db->prepare($query);
             $statement->bindValue(':UID', $UID);

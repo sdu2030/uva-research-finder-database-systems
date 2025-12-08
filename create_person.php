@@ -10,9 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 addStudentQual($_POST['username'], $student_qual);
             }
         }
-        header("location: login.php");
+        // header("location: login.php");
     } else if (isset($_POST['profBtn'])) {
         createPerson($_POST['username'], $_POST['password'], $_POST['person_desc'], $_POST['name']);
+        setRole($_POST['username'], $_POST['research_role']);
         if (!empty($_POST['research_areas'])) {
             addResearchAreas($_POST['username'], $_POST['research_areas']);
         }
@@ -22,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($_POST['courses_taught'])) {
             addCoursesTaught($_POST['username'], $_POST['courses_taught']);
         }
-        header("location: login.php");
+        // header("location: login.php");
     }
 }
 ?>
@@ -41,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         function checkUserType(user) {
             if (user.value === "student") {
                 document.getElementById("qualsBlock").style.display = "block";
+                document.getElementById("roleBlock").style.display = "none";
                 document.getElementById("researchBlock").style.display = "none";
                 document.getElementById("pubsBlock").style.display = "none";
                 document.getElementById("coursesBlock").style.display = "none";
@@ -48,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 document.getElementById("profBtn").style.display = "none";
             } else if (user.value === "researcher") {
                 document.getElementById("qualsBlock").style.display = "none";
+                document.getElementById("roleBlock").style.display = "block";
                 document.getElementById("researchBlock").style.display = "block";
                 document.getElementById("pubsBlock").style.display = "block";
                 document.getElementById("coursesBlock").style.display = "block";
@@ -99,6 +102,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="student_quals" class="form-label fw-bold">Qualifications</label>
                 <select name="student_quals[]" id="student_quals" multiple="multiple">
                     <option value="python">Python</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-3 justify-content-center">
+            <div class="col-sm-10" id="roleBlock" style="display: none;">
+                <label for="research_role" class="form-label fw-bold me-2">Role</label>
+                <select name="research_role" id="research_role" onchange="checkUserType(this);">
+                    <option value="student">Professor</option>
+                    <option value="researcher">Assistant Professor</option>
+                    <option value="student">Associate Professor</option>
+                    <option value="researcher">Research Associate</option>
                 </select>
             </div>
         </div>
