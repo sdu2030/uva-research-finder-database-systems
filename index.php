@@ -6,8 +6,8 @@ switch (@parse_url($_SERVER['REQUEST_URI'])['path']) {
     case '/login.php':     // if you plan to also allow a URL with the file name
         require 'login.php';
         break;
-    case '/create_project.php':
-        require 'create_project.php';
+    case '/create_proj.php':
+        require 'create_proj.php';
         break;
     default:
         http_response_code(404);
