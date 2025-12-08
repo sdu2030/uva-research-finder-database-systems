@@ -3,12 +3,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require('connect-db.php');
 require('project-db.php');
+session_start();
 ?>
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!empty($_POST['addBtn'])) {
-        createProject($_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc'], $UID);
+    if (isset($_POST['addBtn'])) {
+        createProject($_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc'], $_SESSION['currentUser']['UID']);
         if (isset($_POST['keywords'])) {
             $selectedKeywords = $_POST['keywords'];
             foreach ($selectedKeywords as $keyword) {
@@ -21,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 addProjectQual($_POST['PID'], $project_qual);
             }
         }
+        header("Location: prof_details.php");
     }
 }
 ?>
@@ -70,8 +72,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-sm-10">
                 <label for="keywords">Keywords</label>
                 <select name="keywords[]" id="keywords" multiple="multiple">
-                    <option value="machine learning">Machine Learning</option>
                     <option value="os">OS</option>
+                    <option value="gpu">GPU</option>
+                    <option value="cs-and-medicine">CS and medicine</option>
+                    <option value="smart-devices">Smart devices</option>
+                    <option value="machine-learning">Machine learning</option>
+                    <option value="x86">x86</option>
+                    <option value="web-development">Web development</option>
+                    <option value="cs-education">CS education</option>
+                    <option value="llms">LLMs</option>
+                    <option value="ml">ML</option>
+                    <option value="parallel-computing">Parallel computing</option>
+                    <option value="game-development">Game development</option>
+                    <option value="vr">VR</option>
+                    <option value="cybersecurity">Cybersecurity</option>
+                    <option value="databases">Databases</option>
+                    <option value="artificial-intelligence">Artificial intelligence</option>
+                    <option value="cryptocurrency">Cryptocurrency</option>
+                    <option value="software-testing">Software testing</option>
+                    <option value="cloud-computing">Cloud computing</option>
+                    <option value="networks">Networks</option>
+                    <option value="memory">Memory</option>
                 </select>
             </div>
         </div>
@@ -79,7 +100,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-sm-10">
                 <label for="project_quals">Qualifications</label>
                 <select name="project_quals[]" id="project_quals" multiple="multiple">
-                    <option value="python">Python</option>
+                    <option value="cs2100">CS 2100 - Data Structures and Algorithms 1</option>
+                    <option value="cs2120">CS 2120 - Discrete Mathematics and Theory 1</option>
+                    <option value="cs2130">CS 2130 - Computer Systems and Organization 1</option>
+                    <option value="cs3100">CS 3100 - Data Structures and Algorithms 2</option>
+                    <option value="cs3120">CS 3120 - Discrete Mathematics and Theory 2</option>
+                    <option value="cs3130">CS 3130 - Computer Systems and Organization 2</option>
+                    <option value="cs3140">CS 3140 - Software Development Essentials</option>
+                    <option value="cs3240">CS 3240 - Software Engineering</option>
                 </select>
             </div>
         </div>

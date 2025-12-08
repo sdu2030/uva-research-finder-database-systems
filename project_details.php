@@ -3,8 +3,7 @@ session_start();
 require('connect-db.php');
 require('project-db.php');
 require('prof-db.php');
-var_dump($_SESSION);
-var_dump($_GET);
+
 
 if (isset($_GET['pid'])) {
     $_SESSION['pid'] = $_GET['pid'];

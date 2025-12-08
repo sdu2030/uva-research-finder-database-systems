@@ -1,17 +1,88 @@
-# This file specifies files that are *not* uploaded to Google Cloud
-# using gcloud. It follows the same syntax as .gitignore, with the addition of
-# "#!include" directives (which insert the entries of the given .gitignore-style
-# file at that point).
-#
-# For more information, run:
-#   $ gcloud topic gcloudignore
-#
-.gcloudignore
-# If you would like to upload your .git directory, .gitignore file or files
-# from your .gitignore file, remove the corresponding line
-# below:
+# ================================
+# Git / Version Control
+# ================================
 .git
 .gitignore
 
-# PHP Composer dependencies:
-/vendor/
+# ================================
+# macOS Junk
+# ================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ================================
+# Windows Junk
+# ================================
+Thumbs.db
+desktop.ini
+
+# ================================
+# VS Code / JetBrains
+# ================================
+.vscode/
+.idea/
+*.iml
+vcs.xml
+modules.xml
+php.xml
+
+# ================================
+# Node / NPM (if ever present)
+# ================================
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ================================
+# Python / Virtual Envs (just in case)
+# ================================
+__pycache__/
+*.pyc
+env/
+venv/
+
+# ================================
+# Local secrets & env files
+# ================================
+.env
+.env.local
+
+# ================================
+# OS / Temp / Backup Files
+# ================================
+*.log
+*.tmp
+*.swp
+*.bak
+*.old
+*~
+
+# ================================
+# ZIPs & large uploads (you uploaded many earlier)
+# ================================
+*.zip
+*.tgz
+*.tar.gz
+
+# ================================
+# What MUST stay included
+# ================================
+!app.yaml
+!index.php
+!login.php
+!student.php
+!professor.php
+!connect-db.php
+!project_details.php
+!projects.php
+!project-db.php
+!prof-db.php
+!person-db.php
+!login-db.php
+!create_project.php
+!update_project.php
+!request-db.php
+!header.php
+!footer.php
+!assets/

@@ -1,7 +1,9 @@
-# Use the PHP 8.3
 runtime: php83
 
-# Defaults to "serve index.php"
-entrypoint: serve login.php
+entrypoint: serve index.php
 
-# if main page is index.php, comment the above entrypoint setting line
+env_variables:
+  DB_USER: cs4750-research-page
+  DB_PASS: researchDB_25
+  DB_NAME: research_info
+  INSTANCE_CONNECTION_NAME: cs4750-db-group:us-east4:cs4750-research-page
