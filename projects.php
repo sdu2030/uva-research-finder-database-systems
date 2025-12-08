@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['interested'])) {
         unmarkInterested($uid, $pid);
     }
 
-    header("Location: project_details.php?pid=$pid");
+    header("Location: projects.php");
     exit();
 }
 
@@ -42,7 +42,9 @@ else if (isset($_POST['searchBtn'])) {
 else{
     $list_of_projects = getAllProjects();
 }
-$interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
+
+
+#$interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
 ?>
 
 <!doctype html>
@@ -155,7 +157,7 @@ $interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
     <input type="hidden" name="interested" value="0">
     <input type="hidden" name="pid" value="<?php echo $proj_info['PID']; ?>">
     <input type="checkbox" name="interested" value="1"
-    <?php if ($interested) echo "checked"; ?>
+    <?php if (getInterestedValue('uid', $proj_info["PID"])) echo "checked"; ?>
     onchange="this.form.submit()">
     Interested
 </form>
