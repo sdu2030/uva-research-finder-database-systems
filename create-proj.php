@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Samuel Du">
     <meta name="description" content="The create project page for HooResearches.">
-    <meta name="keywords" content="CS 4750, UVA research, student, project page, Database Systems">
+    <meta name="keywords" content="CS 4750, UVA research, professor, project creation page, Database Systems">
     <title>HooResearches Create Project</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php endif; ?>
 
 
-
+    <?php require("header.php"); ?>
 
     <form method="POST" action="/professor.php">
         <!--proj name -->
@@ -154,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <p>&copy; 2025 HooResearches. All Rights Reserved.</p>
 </div>
 
-
+<?php require("footer.php"); ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
