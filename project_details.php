@@ -140,9 +140,7 @@ $interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
     </div>
 </form>
 <?php if ($_SESSION['currentUser']['UID'] == getProjectById($_SESSION['pid'])['UID']) {
-
     echo '<div class="row mt-3 justify-content-center">
-
     <form method="post" id="update" name="update">
 
         <button type="submit" class="btn btn-primary col-sm-10" id="updateBtn" name="updateBtn">Update</button>
@@ -154,11 +152,8 @@ $interested = getInterestedValue($_SESSION['uid'], $_SESSION['pid']);
         <button type="submit" class="btn btn-primary col-sm-10" id="deleteBtn" name="deleteBtn">Delete</button>
 
     </form>
-
 </div>';
-
 }
-
 ?>
 
 <?php require("footer.php"); ?>

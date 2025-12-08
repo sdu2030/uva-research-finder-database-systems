@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+session_start();
 require('connect-db.php');
 require('project-db.php');
 ?>
@@ -8,8 +9,8 @@ require('project-db.php');
 <?php
 $current_project = getProjectById($_SESSION['pid']);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!empty($_POST['updateBtn'])) {
-        updateProject($_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc'], $_SESSION['currentUser']['UID']);
+    if (isset($_POST['updateBtn'])) {
+        updateProject($_SESSION['pid'], $_POST['title'], $_POST['paid_credit'], $_POST['num_students'], $_POST['project_desc']);
         if (isset($_POST['keywords'])) {
             $selectedKeywords = $_POST['keywords'];
             foreach ($selectedKeywords as $keyword) {
@@ -22,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 addProjectQual($_POST['PID'], $project_qual);
             }
         }
+        header("Location: prof_details.php");
     }
 }
 ?>
