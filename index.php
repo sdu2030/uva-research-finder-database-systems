@@ -1,55 +1,16 @@
 <?php
-// index.php - front controller / router for App Engine.
-
-// Figure out what path was requested, e.g. "/student.php", "/professor.php"
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
-
-// Normalize (optional): remove trailing slashes
-$uri = rtrim($uri, '/');
-if ($uri === '') {
-    $uri = '/';
-}
-
-switch ($uri) {
-    case '/student.php':
-    case '/student':
-        require __DIR__ . '/student.php';
+switch (@parse_url($_SERVER['REQUEST_URI'])['path']) {
+    case '/':                   // URL (without file name) to a default screen
+        require 'login.php';
         break;
-
-    case '/professor.php':
-    case '/professor':
-        require __DIR__ . '/professor.php';
+    case '/login.php':     // if you plan to also allow a URL with the file name
+        require 'login.php';
         break;
-
-    case '/create-proj.php':
-    case '/create-proj':
-        require __DIR__ . '/create-proj.php';
-        break; 
-
-    // Default: show login/landing page
+    case '/create_project.php':
+        require 'create_project.php';
+        break;
     default:
-        // If you have a real login.php in this branch:
-        if (file_exists(__DIR__ . '/login.php')) {
-            require __DIR__ . '/login.php';
-        } else {
-            // Simple placeholder so the app works even without login.php
-            ?>
-            <!doctype html>
-            <html>
-            <head>
-                <meta charset="utf-8">
-                <title>HooResearches</title>
-            </head>
-            <body>
-                <h1>HooResearches</h1>
-                <p>Select a portal:</p>
-                <ul>
-                    <li><a href="/student.php">Student Portal</a></li>
-                    <li><a href="/professor.php">Professor Portal</a></li>
-                </ul>
-            </body>
-            </html>
-            <?php
-        }
-        break;
+        http_response_code(404);
+        exit('Not Found');
 }
+?>

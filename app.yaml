@@ -1,11 +1,7 @@
+# Use the PHP 8.3
 runtime: php83
-entrypoint: serve index.php  # or student.php if you're testing just that
 
-env_variables:
-  DB_USER: "cs4750-research-page"
-  DB_PASS: "researchDB_25"
-  DB_NAME: "research_info"
-  CLOUD_SQL_CONNECTION_NAME: "cs4750-db-group:us-east4:cs4750-research-page"
+# Defaults to "serve index.php"
+entrypoint: serve login.php
 
-beta_settings:
-  cloud_sql_instances: "cs4750-db-group:us-east4:cs4750-research-page"
+# if main page is index.php, comment the above entrypoint setting line
