@@ -7,7 +7,7 @@ require_once("connect-db.php");
 function getAllProjects()
 {
     global $db;
-    $query = "SELECT * FROM Project WHERE !filled ORDER BY title DESC";
+    $query = "SELECT * FROM Project WHERE filled = 0 ORDER BY title DESC";
     $statement = $db->prepare($query);
     $statement->execute();
     $projs = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -313,11 +313,11 @@ function addProjectKeyword($PID, $keyword)
 function addProjectQual($PID, $qualification)
 {
     global $db;
-    $query = "INSERT INTO Project_qualifications (qualification) VALUES (:qualification) WHERE PID=:PID";
+    $query = "INSERT INTO Project_qualifications (PID, qualification) VALUES (:PID, :qualification)";
     try {
         $statement = $db->prepare($query);
-        $statement->bindValue(':qualification', $qualification);
         $statement->bindValue(':PID', $PID);
+        $statement->bindValue(':qualification', $qualification);
         $statement->execute();
         $statement->closeCursor();
     }
