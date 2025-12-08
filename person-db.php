@@ -1,4 +1,5 @@
 <?php
+require("connect-db.php");
 
 function createPerson($UID, $pass, $description, $name)
 {

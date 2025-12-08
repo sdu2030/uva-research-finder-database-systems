@@ -1,6 +1,8 @@
 <?php
+require("connect-db.php");
+require("person-db.php");
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (!empty($_POST['stuBtn'])) {
+    if (isset($_POST['stuBtn'])) {
         createPerson($_POST['username'], $_POST['password'], $_POST['person_desc'], $_POST['name']);
         if (!empty($_POST['qualifications'])) {
             $selectedQuals = $_POST['student_quals'];
@@ -8,7 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 addStudentQual($_POST['username'], $student_qual);
             }
         }
-    } else if (!empty($_POST['profBtn'])) {
+        header("location: login.php");
+    } else if (isset($_POST['profBtn'])) {
         createPerson($_POST['username'], $_POST['password'], $_POST['person_desc'], $_POST['name']);
         if (!empty($_POST['research_areas'])) {
             addResearchAreas($_POST['username'], $_POST['research_areas']);
@@ -19,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($_POST['courses_taught'])) {
             addCoursesTaught($_POST['username'], $_POST['courses_taught']);
         }
+        header("location: login.php");
     }
-    header("location: login.php");
 }
 ?>
 <!DOCTYPE html>
@@ -61,19 +64,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="row mb-3 justify-content-center">
             <div class="col-sm-10">
                 <label for="username" class="form-label fw-bold">Username</label>
-                <input type="text" class="form-control" id="username">
+                <input type="text" class="form-control" id="username" name="username">
             </div>
         </div>
         <div class="row mb-3 justify-content-center">
             <div class="col-sm-10">
                 <label for="password" class="form-label fw-bold">Password</label>
-                <input type="password" class="form-control" id="password">
+                <input type="password" class="form-control" id="password" name="password">
             </div>
         </div>
         <div class="row mb-3 justify-content-center">
             <div class="col-sm-10">
                 <label for="name" class="form-label fw-bold">Name</label>
-                <input type="text" class="form-control" id="name">
+                <input type="text" class="form-control" id="name" name="name">
             </div>
         </div>
         <div class="row mb-3 justify-content-center">
@@ -118,8 +121,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </div>
         <div class="row justify-content-center">
-            <button type="submit" class="btn btn-primary col-sm-10" id="stuBtn" style="display: block;">Submit</button>
-            <button type="submit" class="btn btn-primary col-sm-10" id="profBtn" style="display: none;">Submit</button>
+            <button type="submit" class="btn btn-primary col-sm-10" id="stuBtn" name="stuBtn" style="display: block;">Submit</button>
+            <button type="submit" class="btn btn-primary col-sm-10" id="profBtn" name="profBtn" style="display: none;">Submit</button>
         </div>
     </form>
     <?php require("footer.php"); ?>
