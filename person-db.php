@@ -1,25 +1,17 @@
 <?php
 
-function createPerson($pass, $description, $name)
+function createPerson($UID, $pass, $description, $name)
 {
     global $db;
-    $query = "INSERT INTO Person (pass, description, name) VALUES (:pass, :description, :name)";
+    $query = "INSERT INTO Person (UID, pass, description, name) VALUES (:UID, :pass, :description, :name)";
     try {
         $statement = $db->prepare($query);
+        $statement->bindValue(':UID', $UID);
         $statement->bindValue(':pass', $pass);
         $statement->bindValue(':description', $description);
         $statement->bindValue(':name', $name);
         $statement->execute();
         $statement->closeCursor();
-
-        $query = "SELECT * FROM Person WHERE pass=:pass AND description=:description AND name = :name";
-        $statement = $db->prepare($query);
-        $statement->bindValue(':pass', $pass);
-        $statement->bindValue(':description', $description);
-        $statement->bindValue(':name', $name);
-        $result = $statement->execute();
-        $statement->closeCursor();
-        return $result;
     }
     catch (PDOException $e) {
         echo $e->getMessage();

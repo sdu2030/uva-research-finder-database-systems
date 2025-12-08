@@ -1,26 +1,26 @@
 <?php
-$newUser = "";
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!empty($_POST['stuBtn'])) {
-        $newUser = createPerson($_POST['password'], $_POST['person_desc'], $_POST['username']);
+        createPerson($_POST['username'], $_POST['password'], $_POST['person_desc'], $_POST['name']);
         if (!empty($_POST['qualifications'])) {
             $selectedQuals = $_POST['student_quals'];
             foreach ($selectedQuals as $student_qual) {
-                addStudentQual($newUser['UID'], $student_qual);
+                addStudentQual($_POST['username'], $student_qual);
             }
         }
     } else if (!empty($_POST['profBtn'])) {
-        $newUser = createPerson($_POST['password'], $_POST['person_desc'], $_POST['username']);
+        createPerson($_POST['username'], $_POST['password'], $_POST['person_desc'], $_POST['name']);
         if (!empty($_POST['research_areas'])) {
-            addResearchAreas($newUser['UID'], $_POST['research_areas']);
+            addResearchAreas($_POST['username'], $_POST['research_areas']);
         }
         if (!empty($_POST['publications'])) {
-            addPublications($newUser['UID'], $_POST['publications']);
+            addPublications($_POST['username'], $_POST['publications']);
         }
         if (!empty($_POST['courses_taught'])) {
-            addCoursesTaught($newUser['UID'], $_POST['courses_taught']);
+            addCoursesTaught($_POST['username'], $_POST['courses_taught']);
         }
     }
+    header("location: login.php");
 }
 ?>
 <!DOCTYPE html>
@@ -68,6 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-sm-10">
                 <label for="password" class="form-label fw-bold">Password</label>
                 <input type="password" class="form-control" id="password">
+            </div>
+        </div>
+        <div class="row mb-3 justify-content-center">
+            <div class="col-sm-10">
+                <label for="name" class="form-label fw-bold">Name</label>
+                <input type="text" class="form-control" id="name">
             </div>
         </div>
         <div class="row mb-3 justify-content-center">
