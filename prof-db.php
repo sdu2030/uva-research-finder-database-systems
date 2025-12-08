@@ -91,13 +91,11 @@ function getPublications($uid)
 
     $statement->execute([':uid' => $uid]);
 
-    $papers = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+    $papers = $statement->fetchAll(PDO::FETCH_ASSOC);
     $statement->closeCursor();
 
 
-    $string = implode(", ",$papers);
-
-    return $string;
+    return $papers;
 }
 
 function getCourses($uid)
@@ -110,13 +108,11 @@ function getCourses($uid)
 
     $statement->execute([':uid' => $uid]);
 
-    $courses = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+    $courses = $statement->fetchAll(PDO::FETCH_ASSOC);
     $statement->closeCursor();
 
 
-    $string = implode(", ",$courses);
-
-    return $string;
+    return $courses;
 }
 
 

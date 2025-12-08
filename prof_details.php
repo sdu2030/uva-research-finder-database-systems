@@ -6,8 +6,8 @@ require('prof-db.php');
 $_SESSION['pid'] = 104;
 $_SESSION['uid'] = 'akp5ve';
 
-var_dump($_GET);
-var_dump($_SESSION);
+#var_dump($_GET);
+#var_dump($_SESSION);
 
 if (isset($_GET['prof'])) {
     $_SESSION['prof'] = $_GET['prof'];
@@ -41,31 +41,44 @@ if (isset($_GET['prof'])) {
     <div class="row mb-3 justify-content-center">
         <div class="col-sm-10">
             <label for="research_areas" class="form-label fw-bold">Research Areas</label>
-            <div>
+            
+                <p class="border p-3" >
                 <?php echo getResAreas($_SESSION['prof']);?>
-            </div>
+                </p>
+
+            
         </div>
     </div>
 
-    <?php foreach (getProjs($_SESSION['prof']) as $projs): ?>
-        <tr>
-        <td> 
-            <a href="project_details.php?pid=<?php echo $projs['PID']; ?>" class="button">
-            <?php echo $projs['title']; ?>
-        </a>
+    <div class="row mb-3 justify-content-center">
+    <div class="col-sm-10">
+        <label class="form-label fw-bold">Projects</label>
 
-        </td>
+        <ul class="list-group">
+            <?php foreach (getProjs($_SESSION['prof']) as $projs): ?>
+                <li class="list-group-item">
+                    <a href="project_details.php?pid=<?php echo $projs['PID']; ?>">
+                        <?php echo $projs['title']; ?>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
 
-    </tr>
+    </div>
+</div>
 
-
-        <?php endforeach;?>
 
     <div class="row mb-3 justify-content-center">
         <div class="col-sm-10">
             <label for="publications" class="form-label fw-bold">Publications</label>
             <div>
-                <?php echo getPublications($_SESSION['prof']);?>
+                <ul class="list-group">
+                    <?php foreach (getPublications($_SESSION['prof']) as $papers): ?>
+                    <li class="list-group-item">
+                        <p class='fst-italic'><?php echo $papers['publication']; ?> </p>
+                    </li>
+                    <?php endforeach; ?>
+                 </ul>
             </div>
         </div>
     </div>
@@ -74,7 +87,13 @@ if (isset($_GET['prof'])) {
         <div class="col-sm-10">
             <label for="courses_taught" class="form-label fw-bold">Courses Taught</label>
             <div>
-                <?php echo getCourses($_SESSION['prof']);?>
+                <ul class="list-group">
+                    <?php foreach (getCourses($_SESSION['prof']) as $courses): ?>
+                    <li class="list-group-item">
+                        <?php echo $courses['course_taught']; ?> 
+                    </li>
+                    <?php endforeach; ?>
+                 </ul>
             </div>
         </div>
     </div>
