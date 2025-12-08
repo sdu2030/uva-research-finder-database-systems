@@ -1,31 +1,41 @@
 <?php 
 
 require_once("connect-db.php");
+require('project-db.php');
 
 $errors = [];
 $success = "";
 
-if (isset($_POST["create_project"])) {
-    $project_name = trim($_POST["project_name"] ?? null);
-    $description  = trim($_POST["description"] ?? null);
-    $num_spots    = $_POST["num_spots"] ?? null;
-    $paid         = isset($_POST["paid"]) ? 1 : 0;
-    $keywords     = trim($_POST["keywords"] ?? "");
-    $qualifications     = trim($_POST["qualifications"] ?? "");
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-    if ($project_name === "") $errors[] = "Project Name is required.";
-    if ($description === "") $errors[] = "Project Description is required.";
-    if ($num_spots === "" || !ctype_digit($num_spots) || (int)$num_spots <= 0) {
-        $errors[] = "Number of spots must be a positive number.";
-    }
+// The UID of the current user should persist
+$UID = null;
 
-    if (empty($errors)) {
-        $success = "Project successfully created!";
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST["create_project"])) {       
+
+        createProject($_POST['project_name'], $_POST['paid_credit'], $_POST['num_spots'], $_POST['description'], $UID);
+        if (isset($_POST['keywords'])) {
+            $selectedKeywords = $_POST['keywords'];
+            foreach ($selectedKeywords as $keyword) {
+                addProjectKeyword($_POST['PID'], $keyword);
+            }
+        }
+        if (isset($_POST['qualifications'])) {
+            $selectedQuals = $_POST['qualifications'];
+            foreach ($selectedQuals as $project_qual) {
+                addProjectQual($_POST['PID'], $project_qual);
+            }
+        }
+
+        if (empty($errors)) {
+            $success = "Project created";
+        }
     }
 }
-
-
-
 
 ?>
 
@@ -77,7 +87,7 @@ if (isset($_POST["create_project"])) {
 
 
 
-    <form method="POST" action="">
+    <form method="POST" action="/professor.php">
         <!--proj name -->
         <div class="mb-3">
             <label class="form-label fw-bold">Project Name <span class="text-danger">*</span></label>
@@ -89,15 +99,15 @@ if (isset($_POST["create_project"])) {
 
         <div class="btn-group" data-toggle="buttons">
             <label data-value="paid" class="control-label btn btn-default" for="button_0">
-                <input id="button_0" name="opinion" required="required" value="yes" checked="checked" type="radio"/>
+                <input id="button_0" name="opinion" required="required" value="<?php if(($_POST['paid_credit'] ?? 'either') === 'paid') ?>" checked="checked" type="radio"/>
                 Paid
             </label>
             <label data-value="credit" class="control-label btn btn-default" for="button_1">
-                <input id="button_1" name="opinion" required="required" value="no" type="radio"/>
+                <input id="button_1" name="opinion" required="required" value="<?php if(($_POST['paid_credit'] ?? 'either') === 'credit') ?>" type="radio"/>
                 Credit
             </label>
             <label data-value="either" class="control-label btn btn-default" for="button_2">
-                <input id="button_2" name="opinion" required="required" value="no_idea" type="radio" />
+                <input id="button_2" name="opinion" required="required" value="<?php if(($_POST['paid_credit'] ?? 'either') === 'either') ?>" type="radio" />
                 Either
             </label>
         </div>
@@ -134,6 +144,7 @@ if (isset($_POST["create_project"])) {
 
         <!--submit-->
         <button type="submit" class="btn btn-primary">Create Project</button>
+        <input type="hidden" id="PID" name="PID" value="<?php echo $_POST['PID']; ?>">
         <br>
         <p class="text">* indicates required fields</p>
     </form>
