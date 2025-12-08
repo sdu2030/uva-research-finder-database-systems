@@ -5,7 +5,6 @@ ini_set('display_errors', 1);
 require('connect-db.php');
 require('project-db.php');
 #$list_of_projects = getAllProjects();
-$_SESSION['uid'] = 'akp5ve';
 
 if (isset($_GET['pid'])) {
     $_SESSION['pid'] = $_GET['pid'];
@@ -76,7 +75,7 @@ else{
 </div>
 
 </div>
-</form>
+</div>
 <h5>Filter</h5>
 <form method="POST" action="projects.php">
 <div style="display: flex; gap: 20px; align-items: center;">

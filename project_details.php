@@ -3,7 +3,6 @@ session_start();
 require('connect-db.php');
 require('project-db.php');
 require('prof-db.php');
-$_SESSION['uid'] = 'akp5ve';
 var_dump($_SESSION);
 var_dump($_GET);
 
