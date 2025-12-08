@@ -76,6 +76,7 @@ else{
 </div>
 
 </div>
+</form>
 <h5>Filter</h5>
 <form method="POST" action="projects.php">
 <div style="display: flex; gap: 20px; align-items: center;">
